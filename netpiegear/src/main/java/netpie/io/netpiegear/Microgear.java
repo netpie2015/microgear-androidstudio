@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -46,6 +47,11 @@ public class Microgear extends Activity {
     public static String appidvalue, keyvalue, secretvalue;
     public File tempFile;
     public File cDir;
+    public String Namedrive=null;
+    public ArrayList<Publish> PublishList = new ArrayList<Publish>();
+    public ArrayList<Publish> ChatList = new ArrayList<Publish>();
+    public ArrayList<String> SubscribeList = new ArrayList<String>();
+    public ArrayList<String> UnsubscribeList = new ArrayList<String>();
     public EventListener eventListener = new EventListener();
     public Microgear(Context context) {
         this.context = context;
@@ -53,6 +59,15 @@ public class Microgear extends Activity {
         intentFilter.addAction("com.example.MQTT.PushReceived");
     }
 
+    public class Publish {
+        public String Topic;
+        public String Message;
+
+        public Publish(String Topic,String Message){
+            this.Topic = Topic;
+            this.Message = Message;
+        }
+    }
 
     public void connect(String appid, String key, String secret) {
         if (appid.isEmpty() || key.isEmpty() || secret.isEmpty()) {
@@ -186,6 +201,30 @@ public class Microgear extends Activity {
 
     }
 
+    public void ReSubcribeAndPublish(){
+        if(isConnectingToInternet()){
+            if(Namedrive!=null) {
+                setalias(Namedrive);
+            }
+            for (String i : SubscribeList) {
+                eventListener.mError.onException(i+"dddd");
+                subscribe(i);
+            }
+            SubscribeList = new ArrayList<String>();
+            for (Publish i : PublishList) {
+                publish(i.Topic, i.Message);
+            }
+            PublishList = new ArrayList<Publish>();
+            for (Publish i : ChatList) {
+                publish(i.Topic, i.Message);
+            }
+            ChatList = new ArrayList<Publish>();
+            for (String i : UnsubscribeList) {
+                unsubscribe(i);
+            }
+            UnsubscribeList = new ArrayList<String>();
+        }
+    }
 
     public void publish(final String topic, final String message) {
         if (isConnectingToInternet()) {
@@ -205,10 +244,14 @@ public class Microgear extends Activity {
                             try {
                                 service.send(msg);
                             } catch (RemoteException e) {
+                                eventListener.mError.onException(message);
                                 e.printStackTrace();
                                 eventListener.mError.onException("Publish Fail");
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException("Please Connect");
+                                eventListener.mError.onException(message);
+                                Publish publish = new Publish(topic,message);
+                                PublishList.add(publish);
+                                //eventListener.mError.onException("Please Connect");
                             }
                         }
                     }, 300);
@@ -245,7 +288,10 @@ public class Microgear extends Activity {
                                 e.printStackTrace();
                                 eventListener.mError.onException("Publish Fail");
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException("Please Connect");
+                                eventListener.mError.onException(message);
+                                Publish publish = new Publish(topic,message);
+                                PublishList.add(publish);
+
                             }
                         }
                     }, 300);
@@ -276,7 +322,9 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException("Please Connect");
+                                eventListener.mError.onException(topicforsubscribe);
+                                SubscribeList.add(topicforsubscribe);
+                                //eventListener.mError.onException("Please Connect");
                             }
                         }
                     }, 300);
@@ -308,7 +356,8 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException("Please Connect");
+                                UnsubscribeList.add(topicforunsubscribe);
+                                //eventListener.mError.onException("Please Connect");
                             }
                         }
                     }, 300);
@@ -341,7 +390,8 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException("Please Connect");
+                                Namedrive = namedevice;
+                                //eventListener.mError.onException("Please Connect");
                             }
                         }
                     }, 300);
@@ -377,7 +427,9 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException("Please Connect");
+                                Publish publish = new Publish(topicforsendchat,message);
+                                ChatList.add(publish);
+                                //eventListener.mError.onException("Please Connect");
                             }
 
                         }

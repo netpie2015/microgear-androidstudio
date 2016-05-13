@@ -250,7 +250,7 @@ public class MicrogearService extends Service {
             public final String uri = "tcp://" + HOST + ":" + PORT;
             public final int MINTIMEOUT = 2000;
             public int timeout = MINTIMEOUT; // timeout = 2000
-            public Microgear m = new Microgear(getApplicationContext());
+            public Microgear microgear = new Microgear(getApplicationContext());
             public MqttClient client = null;
             public MqttConnectOptions options = new MqttConnectOptions();
             public Vector<String> topics = new Vector<String>();
@@ -293,8 +293,10 @@ public class MicrogearService extends Service {
                         if (connState != CONNECT_STATE.CONNECTED) {
                             try {
                                 client.connect(options);
+
                                 connState = CONNECT_STATE.CONNECTED;
                                 eventListener.mConnect.onConnect(true);
+                                microgear.ReSubcribeAndPublish();
                                 subscribe("&present");
                                 subscribe("&absent");
                                 this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
@@ -307,7 +309,7 @@ public class MicrogearService extends Service {
                                     eventListener.mError.onException("Thing is disable");
                                     this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                                 } else if (e.getReasonCode() == 4) {
-                                    m.reconnect();
+                                    microgear.reconnect();
                                 }
                                 return;
                             }

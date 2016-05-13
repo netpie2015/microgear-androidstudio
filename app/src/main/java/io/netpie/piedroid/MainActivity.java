@@ -14,9 +14,9 @@ public class MainActivity extends Activity {
 
     EventListener eventListener = new EventListener();
     Button ex;
-    String appid = "APPID"; //APP_ID
-    String key = "KEY"; //KEY
-    String secret = "SECRET"; //SECRET
+    String appid = "appid"; //APP_ID
+    String key = "key"; //KEY
+    String secret = "secret"; //SECRET
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +26,10 @@ public class MainActivity extends Activity {
         ex.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                microgear.connect(appid,key,secret);
+
                 microgear.subscribe("/gear1");
+                microgear.connect(appid,key,secret);
+
 
                 (new Thread(new Runnable()
                 {
@@ -47,7 +49,7 @@ public class MainActivity extends Activity {
                                         count++;
                                     }
                                 });
-                                Thread.sleep(1000);
+                                Thread.sleep(2000);
                             }
                             catch (InterruptedException e)
                             {

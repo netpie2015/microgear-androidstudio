@@ -2,18 +2,18 @@
 <items version="2" >
 
     <item
-        jar="D:\Work\piedroid\app\build\intermediates\exploded-aar\piedroid\netpiegear\unspecified\jars\libs\BASE64Decoder.jar"
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\microgear-androidstudio\netpiegear\unspecified\jars\libs\org.eclipse.paho.client.mqttv3-1.0.2.jar"
         jumboMode="true"
         revision="23.0.2"
-        sha1="1c8cb646c183b52d71d5328f73680a08ad5a3f1e">
-        <dex dex="D:\Work\piedroid\app\build\intermediates\transforms\dex\debug\folders\1000\8\BASE64Decoder_c57683aab9e8b4436ca733f219ebc908df446512\classes.dex" />
+        sha1="4746d4c6c60b69668027b8951b5868627d242105">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\8\org.eclipse.paho.client.mqttv3-1.0.2_bafa30c1eefaeb1b2bf9307cc329184495c3abae\classes.dex" />
     </item>
     <item
-        jar="D:\Work\piedroid\app\build\intermediates\exploded-aar\piedroid\netpiegear\unspecified\jars\libs\org.eclipse.paho.client.mqttv3-1.0.2.jar"
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\microgear-androidstudio\netpiegear\unspecified\jars\libs\BASE64Decoder.jar"
         jumboMode="true"
         revision="23.0.2"
-        sha1="7132fbc3a989f5237b901b71a44ea5a86263f3bc">
-        <dex dex="D:\Work\piedroid\app\build\intermediates\transforms\dex\debug\folders\1000\8\org.eclipse.paho.client.mqttv3-1.0.2_c902c5223b37ed88d03afbfc5a56f51d1ba2ba64\classes.dex" />
+        sha1="7845ec94ecdeceefd293db4c65eed00098681197">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\8\BASE64Decoder_632fe4ae0ebd8dae4f42cddea407b0adf6cd45db\classes.dex" />
     </item>
 
 </items>
