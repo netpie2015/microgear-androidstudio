@@ -27,10 +27,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                microgear.subscribe("/gear1");
                 microgear.connect(appid,key,secret);
-
-
+                microgear.subscribe("gear");
                 (new Thread(new Runnable()
                 {
                     int count = 1;
@@ -45,7 +43,7 @@ public class MainActivity extends Activity {
 
                                     @Override
                                     public void run(){
-                                        microgear.publish("gear1", String.valueOf(count)+".  Test message");
+                                        microgear.publish("gear", String.valueOf(count)+".  Test message");
                                         count++;
                                     }
                                 });

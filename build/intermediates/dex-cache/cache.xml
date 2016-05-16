@@ -2,18 +2,60 @@
 <items version="2" >
 
     <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="1f4f078588f3fd63aa1bf7fa6e6eabf0d40772e2">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_b962ca0751d88886cf1055d52b01f6bae471d19c\classes.dex" />
+    </item>
+    <item
         jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\microgear-androidstudio\netpiegear\unspecified\jars\libs\org.eclipse.paho.client.mqttv3-1.0.2.jar"
         jumboMode="true"
         revision="23.0.2"
-        sha1="4746d4c6c60b69668027b8951b5868627d242105">
+        sha1="27d4d8e3b3f25cbd60067423b676abbb7b75795a">
         <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\8\org.eclipse.paho.client.mqttv3-1.0.2_bafa30c1eefaeb1b2bf9307cc329184495c3abae\classes.dex" />
     </item>
     <item
         jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\microgear-androidstudio\netpiegear\unspecified\jars\libs\BASE64Decoder.jar"
         jumboMode="true"
         revision="23.0.2"
-        sha1="7845ec94ecdeceefd293db4c65eed00098681197">
+        sha1="30553b8f95706fa0f8b4091e4ba4ca47c050ebfc">
         <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\8\BASE64Decoder_632fe4ae0ebd8dae4f42cddea407b0adf6cd45db\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.1\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="5c5699834e9722f1c288fea2de82725d078ba127">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-23.1.1_938f20a9f8012f1f3828aa151fbd32b058893b32\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\jars\libs\internal_impl-23.1.1.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="a4de9c81ae239414e1ed0f86441b02abaf29bca9">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-23.1.1_ee4716a21ce2ed673f53329f0919d37438d20e07\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="534666779ff66738bcd5d66a41c72ae5d666a3a9">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_8d0764d42725a42f45c79ebd135629a082d597da\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="6cbc7773921fcfedbe55657578f0cbfe614778dc">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-23.1.1_fb2368f2c0c1ec20f3e107b40747db9b514e76ce\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\achai\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.1\support-annotations-23.1.1.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="8d680ba5a623724d1fb0e81c36a790f023a6cede">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-23.1.1_cfc338755e4ab1b1ee36f9e45409d4f5f7e69eed\classes.dex" />
     </item>
 
 </items>

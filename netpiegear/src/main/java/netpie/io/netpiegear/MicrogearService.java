@@ -18,6 +18,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -254,6 +255,10 @@ public class MicrogearService extends Service {
             public MqttClient client = null;
             public MqttConnectOptions options = new MqttConnectOptions();
             public Vector<String> topics = new Vector<String>();
+            public ArrayList<Microgear.Publish> PublishList ;
+            public ArrayList<String> SubscribeList ;
+            public ArrayList<String> UnsubscribeList ;
+            public String Namedrive=null;
 
             public MsgHandler() {
                 options.setCleanSession(true);
@@ -265,6 +270,25 @@ public class MicrogearService extends Service {
                 } catch (MqttException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
+                }
+            }
+
+            public void ReSubcribeAndPublish(){
+                SubscribeList = microgear.SubscribeList;
+                PublishList = microgear.PublishList;
+                UnsubscribeList = microgear.UnsubscribeList;
+                Namedrive = microgear.Namedrive;
+                if(Namedrive!=null) {
+                    setalias(Namedrive);
+                }
+                for (String i : SubscribeList) {
+                    subscribe(i);
+                }
+                for (Microgear.Publish i : PublishList) {
+                    publish(i.Topic, i.Message);
+                }
+                for (String i : UnsubscribeList) {
+                    unsubscribe(i);
                 }
             }
 
@@ -293,12 +317,11 @@ public class MicrogearService extends Service {
                         if (connState != CONNECT_STATE.CONNECTED) {
                             try {
                                 client.connect(options);
-
                                 connState = CONNECT_STATE.CONNECTED;
                                 eventListener.mConnect.onConnect(true);
-                                microgear.ReSubcribeAndPublish();
                                 subscribe("&present");
                                 subscribe("&absent");
+                                ReSubcribeAndPublish();
                                 this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                             } catch (MqttException e) { // if connect fail
 
@@ -451,7 +474,7 @@ public class MicrogearService extends Service {
             public boolean subscribe(String topic) {
                 try {
                     client.subscribe("/" + appid1 + "/" + topic);
-                    //eventListener.mError.onException("Subscribe complete");
+                    //eventListener.mError.onException("/" + appid1 + "/" + topic);
                 } catch (MqttException e) {
                     eventListener.mError.onException("Subscribe failed");
                     return false;
@@ -551,6 +574,8 @@ public class MicrogearService extends Service {
                 }
 
             }
+
+
 
 
         }

@@ -47,11 +47,10 @@ public class Microgear extends Activity {
     public static String appidvalue, keyvalue, secretvalue;
     public File tempFile;
     public File cDir;
-    public String Namedrive=null;
-    public ArrayList<Publish> PublishList = new ArrayList<Publish>();
-    public ArrayList<Publish> ChatList = new ArrayList<Publish>();
-    public ArrayList<String> SubscribeList = new ArrayList<String>();
-    public ArrayList<String> UnsubscribeList = new ArrayList<String>();
+    static String Namedrive=null;
+    static ArrayList<Publish> PublishList = new ArrayList<Publish>();
+    static ArrayList<String> SubscribeList = new ArrayList<String>();
+    static ArrayList<String> UnsubscribeList = new ArrayList<String>();
     public EventListener eventListener = new EventListener();
     public Microgear(Context context) {
         this.context = context;
@@ -118,7 +117,6 @@ public class Microgear extends Activity {
 
         if (isConnectingToInternet()) {
             oauthNetpieLibrary.create(appidvalue, keyvalue, secretvalue, tempFile.toString());
-
             context.bindService(new Intent(context, MicrogearService.class), serviceConnection, 0);
             brokerconnect(appidvalue, keyvalue, secretvalue);
 
@@ -201,31 +199,6 @@ public class Microgear extends Activity {
 
     }
 
-    public void ReSubcribeAndPublish(){
-        if(isConnectingToInternet()){
-            if(Namedrive!=null) {
-                setalias(Namedrive);
-            }
-            for (String i : SubscribeList) {
-                eventListener.mError.onException(i+"dddd");
-                subscribe(i);
-            }
-            SubscribeList = new ArrayList<String>();
-            for (Publish i : PublishList) {
-                publish(i.Topic, i.Message);
-            }
-            PublishList = new ArrayList<Publish>();
-            for (Publish i : ChatList) {
-                publish(i.Topic, i.Message);
-            }
-            ChatList = new ArrayList<Publish>();
-            for (String i : UnsubscribeList) {
-                unsubscribe(i);
-            }
-            UnsubscribeList = new ArrayList<String>();
-        }
-    }
-
     public void publish(final String topic, final String message) {
         if (isConnectingToInternet()) {
             if (Checktopic(topic)!=null) {
@@ -244,14 +217,11 @@ public class Microgear extends Activity {
                             try {
                                 service.send(msg);
                             } catch (RemoteException e) {
-                                eventListener.mError.onException(message);
                                 e.printStackTrace();
                                 eventListener.mError.onException("Publish Fail");
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException(message);
-                                Publish publish = new Publish(topic,message);
+                                Publish publish = new Publish(Checktopic(topic),message);
                                 PublishList.add(publish);
-                                //eventListener.mError.onException("Please Connect");
                             }
                         }
                     }, 300);
@@ -288,8 +258,7 @@ public class Microgear extends Activity {
                                 e.printStackTrace();
                                 eventListener.mError.onException("Publish Fail");
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException(message);
-                                Publish publish = new Publish(topic,message);
+                                Publish publish = new Publish(Checktopic(topic),message);
                                 PublishList.add(publish);
 
                             }
@@ -322,9 +291,7 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                eventListener.mError.onException(topicforsubscribe);
-                                SubscribeList.add(topicforsubscribe);
-                                //eventListener.mError.onException("Please Connect");
+                                SubscribeList.add(Checktopic(topicforsubscribe));
                             }
                         }
                     }, 300);
@@ -356,7 +323,7 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                UnsubscribeList.add(topicforunsubscribe);
+                                UnsubscribeList.add(Checktopic(topicforunsubscribe));
                                 //eventListener.mError.onException("Please Connect");
                             }
                         }
@@ -391,7 +358,6 @@ public class Microgear extends Activity {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
                                 Namedrive = namedevice;
-                                //eventListener.mError.onException("Please Connect");
                             }
                         }
                     }, 300);
@@ -428,7 +394,7 @@ public class Microgear extends Activity {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
                                 Publish publish = new Publish(topicforsendchat,message);
-                                ChatList.add(publish);
+                                PublishList.add(publish);
                                 //eventListener.mError.onException("Please Connect");
                             }
 
