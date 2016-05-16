@@ -2,9 +2,13 @@ package io.netpie.piedroid;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
 import netpie.io.netpiegear.EventListener;
 import netpie.io.netpiegear.Microgear;
 
@@ -13,17 +17,28 @@ public class MainActivity extends Activity {
     public Microgear microgear = new Microgear(this);
 
     EventListener eventListener = new EventListener();
-    Button ex;
+    Button button;
     String appid = "appid"; //APP_ID
     String key = "key"; //KEY
     String secret = "secret"; //SECRET
 
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Bundle bundle = msg.getData();
+            String string = bundle.getString("myKey");
+            TextView myTextView =
+                    (TextView)findViewById(R.id.textView_ex);
+            myTextView.append(string+"\n");
+        }
+    };
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        button = (Button) findViewById(R.id.btn_ex);
 
-        ex = (Button) findViewById(R.id.btn_ex);
-        ex.setOnClickListener(new View.OnClickListener() {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -58,10 +73,17 @@ public class MainActivity extends Activity {
             }
         });
 
+
+
         eventListener.setConnectEventListener(new EventListener.OnServiceConnect() {
             @Override
             public void onConnect(Boolean status) {
                 if(status == true){
+                    Message msg = handler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("myKey", "Now I'm connected with netpie");
+                    msg.setData(bundle);
+                    handler.sendMessage(msg);
                     Log.i("Connected","Now I'm connected with netpie");
                 }
                 else{
@@ -74,7 +96,13 @@ public class MainActivity extends Activity {
         eventListener.setMessageEventListener(new EventListener.OnMessageReceived() {
             @Override
             public void onMessage(String topic, String message) {
+                Message msg = handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("myKey", topic+" : "+message);
+                msg.setData(bundle);
+                handler.sendMessage(msg);
                 Log.i("Message",topic+" : "+message);
+                //text.setText(topic+" "+message);
             }
         });
 

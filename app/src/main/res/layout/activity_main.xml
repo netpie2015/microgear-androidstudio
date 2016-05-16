@@ -13,4 +13,9 @@
         android:layout_height="wrap_content"
         android:text="Connect"
         android:id="@+id/btn_ex"/>
+
+    <TextView
+        android:layout_width="347dp"
+        android:layout_height="match_parent"
+        android:id="@+id/textView_ex" />
 </LinearLayout>
