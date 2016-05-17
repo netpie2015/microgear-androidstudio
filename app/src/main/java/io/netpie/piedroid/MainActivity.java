@@ -73,8 +73,6 @@ public class MainActivity extends Activity {
             }
         });
 
-
-
         eventListener.setConnectEventListener(new EventListener.OnServiceConnect() {
             @Override
             public void onConnect(Boolean status) {
