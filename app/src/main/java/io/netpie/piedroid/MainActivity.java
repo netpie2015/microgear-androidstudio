@@ -18,9 +18,9 @@ public class MainActivity extends Activity {
 
     EventListener eventListener = new EventListener();
     Button button;
-    String appid = "appid"; //APP_ID
-    String key = "key"; //KEY
-    String secret = "secret"; //SECRET
+    String appid = "APPID"; //APP_ID
+    String key = "KEY"; //KEY
+    String secret = "SERCRET"; //SECRET
 
     Handler handler = new Handler() {
         @Override
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 microgear.connect(appid,key,secret);
-                microgear.subscribe("gear");
+                microgear.subscribe("Topictest");
                 (new Thread(new Runnable()
                 {
                     int count = 1;
@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 
                                     @Override
                                     public void run(){
-                                        microgear.publish("gear", String.valueOf(count)+".  Test message");
+                                        microgear.publish("Topictest", String.valueOf(count)+".  Test message");
                                         count++;
                                     }
                                 });
@@ -109,6 +109,11 @@ public class MainActivity extends Activity {
         eventListener.setPresentEventListener(new EventListener.OnPresent() {
             @Override
             public void onPresent(String name) {
+                Message msg = handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("myKey", "New friend Connect :"+name);
+                msg.setData(bundle);
+                handler.sendMessage(msg);
                 Log.i("present","New friend Connect :"+name);
             }
         });
@@ -116,6 +121,11 @@ public class MainActivity extends Activity {
         eventListener.setAbsentEventListener(new EventListener.OnAbsent() {
             @Override
             public void onAbsent(String name) {
+                Message msg = handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("myKey", "Friend lost :"+name);
+                msg.setData(bundle);
+                handler.sendMessage(msg);
                 Log.i("absent","Friend lost :"+name);
             }
         });
@@ -123,6 +133,11 @@ public class MainActivity extends Activity {
         eventListener.setDisconnectEventListener(new EventListener.OnClose() {
             @Override
             public void onDisconnect(Boolean status) {
+                Message msg = handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("myKey", "Disconnected");
+                msg.setData(bundle);
+                handler.sendMessage(msg);
                 Log.i("disconnect","Disconnected");
             }
         });
@@ -130,6 +145,11 @@ public class MainActivity extends Activity {
         eventListener.setOnException(new EventListener.OnException() {
             @Override
             public void onException(String error) {
+                Message msg = handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("myKey", "Exception : "+error);
+                msg.setData(bundle);
+                handler.sendMessage(msg);
                 Log.i("exception","Exception : "+error);
             }
         });
