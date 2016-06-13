@@ -205,9 +205,7 @@ public class Microgear extends Activity {
                 if (topic.isEmpty() || message.isEmpty()) {
                     eventListener.onError("Topic and Message Require");
                 } else {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
+                    new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
                             data.putCharSequence(MicrogearService.TOPIC, Checktopic(topic));
@@ -225,9 +223,7 @@ public class Microgear extends Activity {
                                 PublishList.add(publish);
                             }
                         }
-                    }, 300);
-
-
+                    }).start();
                 }
             }
         } else {
@@ -242,9 +238,7 @@ public class Microgear extends Activity {
                 if (topic.isEmpty() || message.isEmpty()) {
                     eventListener.onError("Topic and Message Require");
                 } else {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
+                    new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
                             data.putCharSequence(MicrogearService.TOPIC, Checktopic(topic));
@@ -264,9 +258,7 @@ public class Microgear extends Activity {
 
                             }
                         }
-                    }, 300);
-
-
+                    }).start();
                 }
             }
         } else {
@@ -279,9 +271,7 @@ public class Microgear extends Activity {
         if (isConnectingToInternet()) {
             if (!topicforsubscribe.isEmpty()) {
                 if (Checktopic(topicforsubscribe)!=null) {
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
+                    new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
                             data.putCharSequence(MicrogearService.TOPIC, Checktopic(topicforsubscribe));
@@ -295,8 +285,7 @@ public class Microgear extends Activity {
                                 SubscribeList.add(Checktopic(topicforsubscribe));
                             }
                         }
-                    }, 300);
-
+                    }).start();
                 }
             } else {
                 eventListener.onError("Topic  required.");
@@ -311,9 +300,7 @@ public class Microgear extends Activity {
         if (isConnectingToInternet()) {
             if (!topicforunsubscribe.isEmpty()) {
                 if (Checktopic(topicforunsubscribe)!=null) {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
+                    new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
                             data.putCharSequence(MicrogearService.TOPIC, Checktopic(topicforunsubscribe));
@@ -328,8 +315,7 @@ public class Microgear extends Activity {
                                 //eventListener.mError.onException("Please Connect");
                             }
                         }
-                    }, 300);
-
+                    }).start();
                 }
 
             } else {
@@ -345,9 +331,7 @@ public class Microgear extends Activity {
         if (isConnectingToInternet()) {
             if (!namedevice.isEmpty()) {
                 if (Checkname(namedevice)) {
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
+                    new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
                             data.putCharSequence(MicrogearService.TOPIC, namedevice);
@@ -361,9 +345,7 @@ public class Microgear extends Activity {
                                 Namedrive = namedevice;
                             }
                         }
-                    }, 300);
-
-
+                    }).start();
                 }
 
             } else {
@@ -378,10 +360,7 @@ public class Microgear extends Activity {
         if (isConnectingToInternet()) {
             if (!topicforsendchat.isEmpty() && !message.isEmpty()) {
                 if (Checkname(topicforsendchat)) {
-
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
+                    new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
                             data.putCharSequence(MicrogearService.TOPIC, topicforsendchat);
@@ -398,10 +377,8 @@ public class Microgear extends Activity {
                                 PublishList.add(publish);
                                 //eventListener.mError.onException("Please Connect");
                             }
-
                         }
-                    }, 300);
-
+                    }).start();
                 }
 
             } else {

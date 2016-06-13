@@ -58,6 +58,7 @@ public class MainActivity extends Activity  {
                                     @Override
                                     public void run(){
                                         microgear.publish("Topictest", String.valueOf(count)+".  Test message");
+                                        microgear.publish("qqqq", String.valueOf(count)+".  Test message");
                                         count++;
                                     }
                                 });
@@ -105,7 +106,6 @@ public class MainActivity extends Activity  {
             handler.sendMessage(msg);
             Log.i("Message",topic+" : "+message);
             if(message.equals("msg#test#test")){
-                Log.i("Testtttt","sssssssssssssss");
                 MainActivity.this.microgear.publish("/chat", "Hello world#pppppp#qqqqq");
             }
             if(message.equals("msg#test#bye")){
