@@ -1,3 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
 
+    <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\io.netpie\netpiegear\0.0.1\jars\libs\org.eclipse.paho.client.mqttv3-1.0.2.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="46dc2159325916d3cbbbedc91ecc8b17ac16f122">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\pre-dexed\debug\org.eclipse.paho.client.mqttv3-1.0.2_5847c6ee6e415d0b1e9ed753add419d3b65351e5.jar" />
+    </item>
+    <item
+        jar="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\exploded-aar\io.netpie\netpiegear\0.0.1\jars\libs\BASE64Decoder.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="2904dbd072964252dcf704bfd1034966cc927876">
+        <dex dex="C:\Users\achai\OneDrive\Work\microgear-androidstudio\app\build\intermediates\pre-dexed\debug\BASE64Decoder_976e0aebed5c962362babea0be16605c9d2542d2.jar" />
+    </item>
+
+</items>

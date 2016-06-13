@@ -9,18 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import netpie.io.netpiegear.EventListener;
 import netpie.io.netpiegear.Microgear;
+import netpie.io.netpiegear.MicrogearEventListener;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity  {
 
-    public Microgear microgear = new Microgear(this);
-
-    EventListener eventListener = new EventListener();
-    Button button;
-    String appid = "APPID"; //APP_ID
-    String key = "KEY"; //KEY
-    String secret = "SERCRET"; //SECRET
+    private Microgear microgear = new Microgear(this);
+    private Button button;
+    private String appid = "APPID"; //APP_ID
+    private String key = "APPKEY"; //KEY
+    private String secret = "SECRET"; //SECRET
 
     Handler handler = new Handler() {
         @Override
@@ -37,13 +35,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button = (Button) findViewById(R.id.btn_ex);
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                MicrogearCallBack callback = new MicrogearCallBack();
                 microgear.connect(appid,key,secret);
+                microgear.setCallback(callback);
                 microgear.subscribe("Topictest");
+                microgear.subscribe("/chat");
                 (new Thread(new Runnable()
                 {
                     int count = 1;
@@ -73,84 +72,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        eventListener.setConnectEventListener(new EventListener.OnServiceConnect() {
-            @Override
-            public void onConnect(Boolean status) {
-                if(status == true){
-                    Message msg = handler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("myKey", "Now I'm connected with netpie");
-                    msg.setData(bundle);
-                    handler.sendMessage(msg);
-                    Log.i("Connected","Now I'm connected with netpie");
-                }
-                else{
-                    Log.i("NotConnect","Can't connect to netpie");
-                }
-            }
-
-        });
-
-        eventListener.setMessageEventListener(new EventListener.OnMessageReceived() {
-            @Override
-            public void onMessage(String topic, String message) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", topic+" : "+message);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("Message",topic+" : "+message);
-                //text.setText(topic+" "+message);
-            }
-        });
-
-        eventListener.setPresentEventListener(new EventListener.OnPresent() {
-            @Override
-            public void onPresent(String name) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "New friend Connect :"+name);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("present","New friend Connect :"+name);
-            }
-        });
-
-        eventListener.setAbsentEventListener(new EventListener.OnAbsent() {
-            @Override
-            public void onAbsent(String name) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "Friend lost :"+name);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("absent","Friend lost :"+name);
-            }
-        });
-
-        eventListener.setDisconnectEventListener(new EventListener.OnClose() {
-            @Override
-            public void onDisconnect(Boolean status) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "Disconnected");
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("disconnect","Disconnected");
-            }
-        });
-
-        eventListener.setOnException(new EventListener.OnException() {
-            @Override
-            public void onException(String error) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "Exception : "+error);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("exception","Exception : "+error);
-            }
-        });
     }
 
 
@@ -163,5 +84,82 @@ public class MainActivity extends Activity {
         super.onResume();
         microgear.bindServiceResume();
     }
+
+    class MicrogearCallBack implements MicrogearEventListener{
+        @Override
+        public void onConnect() {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Now I'm connected with netpie");
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("Connected","Now I'm connected with netpie");
+        }
+
+        @Override
+        public void onMessage(String topic, String message) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", topic+" : "+message);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("Message",topic+" : "+message);
+            if(message.equals("msg#test#test")){
+                Log.i("Testtttt","sssssssssssssss");
+                MainActivity.this.microgear.publish("/chat", "Hello world#pppppp#qqqqq");
+            }
+            if(message.equals("msg#test#bye")){
+                MainActivity.this.microgear.disconnect();
+            }
+            if(message.equals("msg#test#sub")){
+                MainActivity.this.microgear.subscribe("qqqq");
+            }
+            if(message.equals("msg#test#unsub")){
+                MainActivity.this.microgear.unsubscribe("qqqq");
+            }
+        }
+
+        @Override
+        public void onPresent(String token) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "New friend Connect :"+token);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("present","New friend Connect :"+token);
+        }
+
+        @Override
+        public void onAbsent(String token) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Friend lost :"+token);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("absent","Friend lost :"+token);
+        }
+
+        @Override
+        public void onDisconnect() {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Disconnected");
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("disconnect","Disconnected");
+        }
+
+        @Override
+        public void onError(String error) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Exception : "+error);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("exception","Exception : "+error);
+        }
+    }
+
+
 
 }

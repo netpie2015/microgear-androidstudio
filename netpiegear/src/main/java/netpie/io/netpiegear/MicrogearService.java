@@ -17,6 +17,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,18 +25,19 @@ import java.util.Vector;
 
 
 public class MicrogearService extends Service {
-    public static boolean serviceRunning = false;
-    public static String status = "1";
-    public static MQTTConnection connection = null;
-    public final Messenger clientMessenger = new Messenger(new ClientHandler());
-    public static String _username = "", _password = "", _clientid = "", appid1 = "", key1, secret1, path1;
-    public static EventListener eventListener = new EventListener();
+    private static boolean serviceRunning = false;
+    private static String status = "1";
+    private static MQTTConnection connection = null;
+    private final Messenger clientMessenger = new Messenger(new ClientHandler());
+    private static String _username = "", _password = "", _clientid = "", appid1 = "", key1, secret1, path1;
+    private MqttClient client ;
+
     public void onCreate() {
         super.onCreate();
         try {
             connection = new MQTTConnection();
         } catch (IllegalArgumentException e) {
-            eventListener.mError.onException("Check format App id ,key and Secret");
+            Microgear.eventListener.onError("Check format App id ,key and Secret");
         }
 
     }
@@ -64,7 +66,7 @@ public class MicrogearService extends Service {
         try {
             connection.start();
         } catch (NullPointerException e) {
-            eventListener.mError.onException("Error Check appid,appkey or appsecret");
+            Microgear.eventListener.onError("Error Check appid,appkey or appsecret");
         }
 
 
@@ -87,7 +89,7 @@ public class MicrogearService extends Service {
         /*
          * Return a reference to our client handler.
 		 */
-        return clientMessenger.getBinder();
+        return clientMessenger.getBinder() ;
     }
 
     public synchronized static boolean isRunning() {
@@ -185,7 +187,7 @@ public class MicrogearService extends Service {
 
     public void ReplytoClient(Messenger responseMessenger, int type, boolean status) {
          /*
-		  * A response can be sent back to a requester when
+          * A response can be sent back to a requester when
 		  * the replyTo field is set in a Message, passed to this
 		  * method as the first parameter.
 		  */
@@ -230,8 +232,8 @@ public class MicrogearService extends Service {
         }
 
         public void makeRequest(Message msg) {
-			/*
-			 * It is expected that the caller only invokes
+            /*
+             * It is expected that the caller only invokes
 			 * this method with valid msg.what.
 			 */
             msgHandler.sendMessage(Message.obtain(msg));
@@ -251,14 +253,13 @@ public class MicrogearService extends Service {
             public final String uri = "tcp://" + HOST + ":" + PORT;
             public final int MINTIMEOUT = 2000;
             public int timeout = MINTIMEOUT; // timeout = 2000
-            public Microgear microgear = new Microgear(getApplicationContext());
-            public MqttClient client = null;
             public MqttConnectOptions options = new MqttConnectOptions();
             public Vector<String> topics = new Vector<String>();
-            public ArrayList<Microgear.Publish> PublishList ;
-            public ArrayList<String> SubscribeList ;
-            public ArrayList<String> UnsubscribeList ;
-            public String Namedrive=null;
+            public ArrayList<Microgear.Publish> PublishList;
+            public ArrayList<String> SubscribeList;
+            public ArrayList<String> UnsubscribeList;
+            public String Namedrive = null;
+            public int qos = 0;
 
             public MsgHandler() {
                 options.setCleanSession(true);
@@ -273,12 +274,12 @@ public class MicrogearService extends Service {
                 }
             }
 
-            public void ReSubcribeAndPublish(){
-                SubscribeList = microgear.SubscribeList;
-                PublishList = microgear.PublishList;
-                UnsubscribeList = microgear.UnsubscribeList;
-                Namedrive = microgear.Namedrive;
-                if(Namedrive!=null) {
+            public void ReSubcribeAndPublish() {
+                SubscribeList = Microgear.SubscribeList;
+                PublishList = Microgear.PublishList;
+                UnsubscribeList = Microgear.UnsubscribeList;
+                Namedrive = Microgear.Namedrive;
+                if (Namedrive != null) {
                     setalias(Namedrive);
                 }
                 for (String i : SubscribeList) {
@@ -296,19 +297,19 @@ public class MicrogearService extends Service {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case STOP: {
-					/*
-					 * Clean up, and terminate.
+                    /*
+                     * Clean up, and terminate.
 					 */
                         client.setCallback(null);
                         if (client.isConnected()) {
-                            try {
-                                client.disconnect();
-                                client.close();
-                                eventListener.mClose.onDisconnect(true);
-                            } catch (MqttException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+
+                                DisconnectThread Disconnect = new DisconnectThread();
+                                Thread DisconnectThread = new Thread(Disconnect);
+                                DisconnectThread.start();
+                                //client.disconnect();
+                                //client.close();
+                                //EventListener.onDisconnect();
+
                         }
                         break;
                     }
@@ -318,7 +319,7 @@ public class MicrogearService extends Service {
                             try {
                                 client.connect(options);
                                 connState = CONNECT_STATE.CONNECTED;
-                                eventListener.mConnect.onConnect(true);
+                                Microgear.eventListener.onConnect();
                                 subscribe("&present");
                                 subscribe("&absent");
                                 ReSubcribeAndPublish();
@@ -326,13 +327,13 @@ public class MicrogearService extends Service {
                             } catch (MqttException e) { // if connect fail
 
                                 if (e.getReasonCode() == 0) {
-                                    eventListener.mError.onException("No Internet connection");
+                                    Microgear.eventListener.onError("No Internet connection");
                                     this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                                 } else if (e.getReasonCode() == 5) {
-                                    eventListener.mError.onException("Thing is disable");
+                                    Microgear.eventListener.onError("Thing is disable");
                                     this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                                 } else if (e.getReasonCode() == 4) {
-                                    microgear.reconnect();
+                                    //Microgear.reconnect();
                                 }
                                 return;
                             }
@@ -359,7 +360,8 @@ public class MicrogearService extends Service {
                             if (cs != null) {
                                 String topic = cs.toString().trim();
                                 if (topic.isEmpty() == false) {
-                                    status = subscribe(topic);
+                                    status = true;
+                                    subscribe(topic);
 	        					/*
 	        					 * Save this topic for re-subscription if needed.
 	        					 */
@@ -400,7 +402,8 @@ public class MicrogearService extends Service {
                             if (cs != null) {
                                 String topic = cs.toString().trim();
                                 if (topic.isEmpty() == false) {
-                                    status = unsubscribe(topic);
+                                    status = true;
+                                    unsubscribe(topic);
 	        					/*
 	        					 * Save this topic for re-subscription if needed.
 	        					 */
@@ -455,11 +458,10 @@ public class MicrogearService extends Service {
                                 if (topic.isEmpty() == false) {
                                     cs = b.getCharSequence(MESSAGE);
                                     Boolean re = b.getBoolean(RETAIN);
-                                    Integer qos = b.getInt(QOS);
                                     if (cs != null) {
                                         String message = cs.toString().trim();
                                         if (message.isEmpty() == false) {
-                                            publishre(topic, message, qos, re);
+                                            publish(topic, message, re);
                                         }
                                     }
                                 }
@@ -471,87 +473,80 @@ public class MicrogearService extends Service {
             }
 
 
-            public boolean subscribe(String topic) {
-                try {
-                    client.subscribe("/" + appid1 + "/" + topic);
-                    //eventListener.mError.onException("/" + appid1 + "/" + topic);
-                } catch (MqttException e) {
-                    eventListener.mError.onException("Subscribe failed");
-                    return false;
-                }
-                return true;
+            public void subscribe(String topic) {
+
+                SubscribeThread Subcribe = new SubscribeThread("/" + appid1 + "/" + topic);
+                Thread SubscribeThread = new Thread(Subcribe);
+                SubscribeThread.start();
+                //client.subscribe("/" + appid1 + "/" + topic);
+                //eventListener.mError.onException("/" + appid1 + "/" + topic);
+
             }
 
 
-            public boolean setalias(String namedevice) {
+            public void setalias(String namedevice) {
                 String msg = "";
                 MqttMessage message = new MqttMessage();
+                message.setQos(qos);
                 message.setPayload(msg.getBytes());
-                try {
-                    client.publish("/" + appid1 + "/" + "@setalias/" + namedevice, message);
-                    //eventListener.mError.onException("Setname Complete");
-                } catch (MqttException e) {
-                    eventListener.mError.onException("Setname failed");
-                    e.printStackTrace();
-                    return false;
-                }
-                return true;
+                PublishThread publish = new PublishThread("/" + appid1 + "/" + "@setalias/" + namedevice, message);
+                Thread PublishThread = new Thread(publish);
+                PublishThread.start();
+                //client.publish("/" + appid1 + "/" + "@setalias/" + namedevice, message);
+                //eventListener.mError.onException("Setname Complete");
+
             }
 
-            public boolean chat(String namedevice, String msg) {
-                try {
-                    MqttMessage message = new MqttMessage();
-                    message.setPayload(msg.getBytes());
-                    client.publish("/" + appid1 + "/" + "gearname/" + namedevice, message);
-                    //eventListener.mError.onException("Chat Complete");
-                } catch (MqttException e) {
-                    eventListener.mError.onException("Chat failed");
-                    return false;
-                }
-                return true;
+            public void chat(String namedevice, String msg) {
+
+                MqttMessage message = new MqttMessage();
+                message.setQos(qos);
+                message.setPayload(msg.getBytes());
+                PublishThread publish = new PublishThread("/" + appid1 + "/" + "gearname/" + namedevice, message);
+                Thread PublishThread = new Thread(publish);
+                PublishThread.start();
+                //client.publish("/" + appid1 + "/" + "gearname/" + namedevice, message);
+                //eventListener.mError.onException("Chat Complete");
+
             }
 
-            public boolean publish(String topic, String msg) {
-                try {
-                    MqttMessage message = new MqttMessage();
-                    message.setPayload(msg.getBytes());
-                    client.publish("/" + appid1 + "/" + topic, message);
-                    //eventListener.mError.onException("Publish Complete");
-                } catch (MqttException e) {
-                    eventListener.mError.onException("Publish Failed");
-                    return false;
-                }
-                return true;
+            public void publish(String topic, String msg) {
+
+                MqttMessage message = new MqttMessage();
+                message.setQos(qos);
+                message.setPayload(msg.getBytes());
+                PublishThread publish = new PublishThread("/" + appid1 + "/" + topic, message);
+                Thread PublishThread = new Thread(publish);
+                PublishThread.start();
+                //client.publish("/" + appid1 + "/" + topic, message);
+                //eventListener.mError.onException("Publish Complete");
+
+
             }
 
-            public boolean publishre(String topic, String msg, Integer qos, Boolean retain) {
-                try {
-                    MqttMessage message = new MqttMessage();
-                    message.setPayload(msg.getBytes());
-                    client.publish("/" + appid1 + "/" + topic, message.getPayload(), qos, retain);
-                    //eventListener.mError.onException("Publish Complete");
-                } catch (MqttException e) {
-                    eventListener.mError.onException("Publish failed");
-                    return false;
-                }
-                return true;
+            public void publish(String topic, String msg, Boolean retain) {
+
+                MqttMessage message = new MqttMessage();
+                message.setQos(qos);
+                message.setPayload(msg.getBytes());
+                PublishThread publish = new PublishThread("/" + appid1 + "/" + topic, message, retain);
+                Thread PublishThread = new Thread(publish);
+                PublishThread.start();
+                //client.publish("/" + appid1 + "/" + topic, message.getPayload(), qos, retain);
+                //eventListener.mError.onException("Publish Complete");
             }
 
-            public boolean unsubscribe(String topic) {
-                try {
-                    client.unsubscribe("/" + appid1 + "/" + topic);
-                    //eventListener.mError.onException("UnSubscribe Complete");
-                    return true;
-                } catch (MqttException e) {
-                    eventListener.mError.onException("UnSubscribe failed");
-                    e.printStackTrace();
-                    return false;
-                }
+            public void unsubscribe(String topic) {
+                UnsubscribeThread Unsubcribe = new UnsubscribeThread("/" + appid1 + "/" + topic);
+                Thread UnsubscribeThread = new Thread(Unsubcribe);
+                UnsubscribeThread.start();
+                //client.unsubscribe("/" + appid1 + "/" + topic);
+                //eventListener.mError.onException("UnSubscribe Complete");
             }
 
 
             public void connectionLost(Throwable arg0) {
-                eventListener.mError.onException("connectionLost");
+                Microgear.eventListener.onError("connection Lost");
                 connState = CONNECT_STATE.DISCONNECTED;
                 status = "2";
                 sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
@@ -566,20 +561,109 @@ public class MicrogearService extends Service {
                 int pre = topic.indexOf("&present");
                 int ab = topic.indexOf("&absent");
                 if (pre != -1) {
-                    eventListener.mPresent.onPresent(message + "");
+                    Microgear.eventListener.onPresent(message + "");
                 } else if (ab != -1) {
-                    eventListener.mAbsent.onAbsent(message + "");
+                    Microgear.eventListener.onAbsent(message + "");
                 } else {
-                    eventListener.mMessage.onMessage(topic, message + "");
+                    Microgear.eventListener.onMessage(topic, message + "");
                 }
 
             }
 
 
+        }
 
+    }
+
+    private class PublishThread extends Thread {
+        String Topic;
+        MqttMessage Message;
+        boolean Retainde = false;
+
+        public void run() {
+            if (Retainde) {
+                try {
+                    client.publish(this.Topic, this.Message.getPayload(), 0, Retainde);
+                } catch (MqttPersistenceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (MqttException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    client.publish(this.Topic, this.Message);
+                } catch (MqttPersistenceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (MqttException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
 
         }
 
+        public PublishThread(String topic, MqttMessage message, boolean retainde) {
+            this.Topic = topic;
+            this.Message = message;
+            this.Retainde = retainde;
+        }
+
+        public PublishThread(String topic, MqttMessage message) {
+            this.Topic = topic;
+            this.Message = message;
+        }
+    }
+
+    private class DisconnectThread extends Thread {
+        public void run() {
+            try {
+                client.disconnect();
+                Microgear.eventListener.onDisconnect();
+            } catch (MqttException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private class SubscribeThread extends Thread {
+        String Topic;
+
+        public void run() {
+            try {
+                client.subscribe(Topic);
+            } catch (MqttException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+        public SubscribeThread(String topic) {
+            this.Topic = topic;
+        }
+    }
+
+    private class UnsubscribeThread extends Thread {
+        String Topic;
+
+        public void run() {
+            try {
+                client.unsubscribe(Topic);
+            } catch (MqttException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+        public UnsubscribeThread(String topic) {
+            this.Topic = topic;
+        }
     }
 
 }

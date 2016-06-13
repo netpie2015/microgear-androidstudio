@@ -1,4 +1,29 @@
+apply plugin: 'maven'
 apply plugin: 'com.android.library'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'microgear'
+
+    publishedGroupId = 'io.netpie'
+    libraryName = 'Microgear'
+    artifact = 'netpiegear'
+
+    libraryDescription = 'microgear-android is a client library for Android Studio.The library is used to connect application code with the NETPIE Platform\'s service for developing IoT applications. For more details on the NETPIE Platform'
+
+    siteUrl = 'https://github.com/netpieio/microgear-androidstudio'
+    gitUrl = 'https://github.com/netpieio/microgear-androidstudio.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'chaiwith'
+    developerName = 'Chaiwith Santaweesuk'
+    developerEmail = 'a.chaiwith@gmail.com'
+
+    licenseName = 'ISC'
+    licenseUrl = 'https://opensource.org/licenses/ISC'
+    allLicenses = ["ISC"]
+}
 
 android {
     compileSdkVersion 23
@@ -25,3 +50,6 @@ dependencies {
     compile files('libs/org.eclipse.paho.client.mqttv3-1.0.2.jar')
     compile files('libs/BASE64Decoder.jar')
 }
+
+apply from: 'https://raw.githubusercontent.com/chaiwith/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/chaiwith/JCenter/master/bintrayv1.gradle'

@@ -51,11 +51,15 @@ public class Microgear extends Activity {
     static ArrayList<Publish> PublishList = new ArrayList<Publish>();
     static ArrayList<String> SubscribeList = new ArrayList<String>();
     static ArrayList<String> UnsubscribeList = new ArrayList<String>();
-    public EventListener eventListener = new EventListener();
+    static MicrogearEventListener eventListener ;
     public Microgear(Context context) {
         this.context = context;
         intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.MQTT.PushReceived");
+    }
+
+    public void setCallback(MicrogearEventListener eventListener){
+        this.eventListener = eventListener;
     }
 
     public class Publish {
@@ -70,8 +74,7 @@ public class Microgear extends Activity {
 
     public void connect(String appid, String key, String secret) {
         if (appid.isEmpty() || key.isEmpty() || secret.isEmpty()) {
-            eventListener.mError.onException("App id ,Key or Secret is Empty");
-            eventListener.mConnect.onConnect(false);
+            eventListener.onError("App id ,Key or Secret is Empty");
         } else {
             appidvalue = appid;
             keyvalue = key;
@@ -88,12 +91,10 @@ public class Microgear extends Activity {
                     brokerconnect(appid, key, secret);
                     context.bindService(new Intent(context, MicrogearService.class), serviceConnection, 0);
                 } else if (a.equals("id")) {
-                    eventListener.mError.onException("App id Invalid");
-                    eventListener.mConnect.onConnect(false);
+                    eventListener.onError("App id Invalid");
                     disconnect();
                 } else if (a.equals("secretandid")) {
-                    eventListener.mError.onException("App id,Key or Secret Invalid");
-                    eventListener.mConnect.onConnect(false);
+                    eventListener.onError("App id,Key or Secret Invalid");
                     disconnect();
                 } else {
                     brokerconnect(appid, key, secret);
@@ -102,8 +103,7 @@ public class Microgear extends Activity {
 
 
             } else {
-                eventListener.mError.onException("No internet connection");
-                eventListener.mConnect.onConnect(false);
+                eventListener.onError("No internet connection");
             }
         }
     }
@@ -122,8 +122,8 @@ public class Microgear extends Activity {
 
 
         } else {
-            eventListener.mError.onException("No internet connection");
-            eventListener.mConnect.onConnect(false);
+            eventListener.onError("No internet connection");
+            //eventListener.onConnect();
         }
     }
 
@@ -203,7 +203,7 @@ public class Microgear extends Activity {
         if (isConnectingToInternet()) {
             if (Checktopic(topic)!=null) {
                 if (topic.isEmpty() || message.isEmpty()) {
-                    eventListener.mError.onException("Topic and Message Require");
+                    eventListener.onError("Topic and Message Require");
                 } else {
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -216,9 +216,10 @@ public class Microgear extends Activity {
                             msg.setData(data);
                             try {
                                 service.send(msg);
+
                             } catch (RemoteException e) {
                                 e.printStackTrace();
-                                eventListener.mError.onException("Publish Fail");
+                                eventListener.onError("Publish Fail");
                             } catch (NullPointerException e) {
                                 Publish publish = new Publish(Checktopic(topic),message);
                                 PublishList.add(publish);
@@ -230,7 +231,7 @@ public class Microgear extends Activity {
                 }
             }
         } else {
-            eventListener.mError.onException("No internet connection");
+            eventListener.onError("No internet connection");
         }
 
     }
@@ -239,7 +240,7 @@ public class Microgear extends Activity {
         if (isConnectingToInternet()) {
             if (Checktopic(topic)!=null) {
                 if (topic.isEmpty() || message.isEmpty()) {
-                    eventListener.mError.onException("Topic and Message Require");
+                    eventListener.onError("Topic and Message Require");
                 } else {
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -256,7 +257,7 @@ public class Microgear extends Activity {
                                 service.send(msg);
                             } catch (RemoteException e) {
                                 e.printStackTrace();
-                                eventListener.mError.onException("Publish Fail");
+                                eventListener.onError("Publish Fail");
                             } catch (NullPointerException e) {
                                 Publish publish = new Publish(Checktopic(topic),message);
                                 PublishList.add(publish);
@@ -269,7 +270,7 @@ public class Microgear extends Activity {
                 }
             }
         } else {
-            eventListener.mError.onException("No internet connection");
+            eventListener.onError("No internet connection");
         }
 
     }
@@ -298,10 +299,10 @@ public class Microgear extends Activity {
 
                 }
             } else {
-                eventListener.mError.onException("Topic  required.");
+                eventListener.onError("Topic  required.");
             }
         } else {
-            eventListener.mError.onException("No internet connection");
+            eventListener.onError("No internet connection");
         }
 
     }
@@ -332,10 +333,10 @@ public class Microgear extends Activity {
                 }
 
             } else {
-                eventListener.mError.onException("Topic  required.");
+                eventListener.onError("Topic  required.");
             }
         } else {
-            eventListener.mError.onException("No internet connection");
+            eventListener.onError("No internet connection");
         }
 
     }
@@ -366,10 +367,10 @@ public class Microgear extends Activity {
                 }
 
             } else {
-                eventListener.mError.onException("Topic  required.");
+                eventListener.onError("Topic  required.");
             }
         } else {
-            eventListener.mError.onException("No internet connection");
+            eventListener.onError("No internet connection");
         }
     }
 
@@ -404,10 +405,10 @@ public class Microgear extends Activity {
                 }
 
             } else {
-                eventListener.mError.onException("Topic and Message required.");
+                eventListener.onError("Topic and Message required.");
             }
         } else {
-            eventListener.mError.onException("No internet connection");
+            eventListener.onError("No internet connection");
         }
     }
 
@@ -417,11 +418,14 @@ public class Microgear extends Activity {
         if (connectivity != null) {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
             if (info != null)
-                for (int i = 0; i < info.length; i++)
+
+                for (int i = 0; i < info.length; i++) {
+
                     if (info[i].getState() == NetworkInfo.State.CONNECTED) {
                         return true;
                     }
 
+                }
         }
         return false;
     }
@@ -432,7 +436,7 @@ public class Microgear extends Activity {
         if (!p.matcher(Topic).find() && !Topic.isEmpty()) {
             return true;
         } else {
-            eventListener.mError.onException("name must be A-Z,a-z,0-9,_ and must not spaces.");
+            eventListener.onError("name must be A-Z,a-z,0-9,_ and must not spaces.");
             return false;
         }
     }
@@ -448,7 +452,7 @@ public class Microgear extends Activity {
                 return Topic;
             }
         } else {
-            eventListener.mError.onException("name must be A-Z,a-z,0-9,_ and must not spaces.");
+            eventListener.onError("name must be A-Z,a-z,0-9,_ and must not spaces.");
             return null;
         }
     }
@@ -472,7 +476,7 @@ public class Microgear extends Activity {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            eventListener.mError.onException("service disconnect");
+            eventListener.onError("service disconnect");
         }
     };
 
