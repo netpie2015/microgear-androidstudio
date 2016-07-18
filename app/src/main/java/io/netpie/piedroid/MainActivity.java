@@ -9,16 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import netpie.io.netpiegear.Microgear;
-import netpie.io.netpiegear.MicrogearEventListener;
+import io.netpie.microgear.Microgear;
+import io.netpie.microgear.MicrogearEventListener;
 
 public class MainActivity extends Activity  {
 
     private Microgear microgear = new Microgear(this);
     private Button button;
-    private String appid = "APPID"; //APP_ID
-    private String key = "APPKEY"; //KEY
-    private String secret = "SECRET"; //SECRET
+    private String appid = "demoMicrogear"; //APP_ID
+    private String key = "WZkTuIs3kkY2JKy"; //KEY
+    private String secret = "k6RGdYfTj1eeIwu3Tug7pmrca"; //SECRET
 
     Handler handler = new Handler() {
         @Override
@@ -149,7 +149,7 @@ public class MainActivity extends Activity  {
             Log.i("disconnect","Disconnected");
         }
 
-        @Override
+         @Override
         public void onError(String error) {
             Message msg = handler.obtainMessage();
             Bundle bundle = new Bundle();

@@ -9,15 +9,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/netpiegear" />
+            <option value="$PROJECT_DIR$/microgear" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/netpiegear" />
+            <option value="$PROJECT_DIR$/microgear" />
           </set>
         </option>
       </GradleProjectSettings>
