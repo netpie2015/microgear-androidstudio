@@ -10,27 +10,22 @@ microgear-android คือ client library สำหรับ Android Studio ท
 -----------
 ```java
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-
-import netpie.io.netpiegear.EventListener;
-import netpie.io.netpiegear.Microgear;
+import io.netpie.microgear.Microgear;
+import io.netpie.microgear.MicrogearEventListener;
 
 public class MainActivity extends Activity {
 
-    public Microgear microgear = new Microgear(this);
-
-    EventListener eventListener = new EventListener();
-    Button button;
+    private Microgear microgear = new Microgear(this);
     String appid = "APPID"; //APP_ID
     String key = "KEY"; //KEY
     String secret = "SERCRET"; //SECRET
+    private String alias = "android";
 
     Handler handler = new Handler() {
         @Override
@@ -38,7 +33,7 @@ public class MainActivity extends Activity {
             Bundle bundle = msg.getData();
             String string = bundle.getString("myKey");
             TextView myTextView =
-                    (TextView)findViewById(R.id.textView_ex);
+                    (TextView)findViewById(R.id.textView);
             myTextView.append(string+"\n");
         }
     };
@@ -46,121 +41,35 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        button = (Button) findViewById(R.id.btn_ex);
-
-        button.setOnClickListener(new View.OnClickListener() {
+        MicrogearCallBack callback = new MicrogearCallBack();
+        microgear.connect(appid,key,secret,alias);
+        microgear.setCallback(callback);
+        microgear.subscribe("Topictest");
+        (new Thread(new Runnable()
+        {
+            int count = 1;
             @Override
-            public void onClick(View v) {
-
-                microgear.connect(appid,key,secret);
-                microgear.subscribe("Topictest");
-                (new Thread(new Runnable()
-                {
-                    int count = 1;
-                    @Override
-                    public void run()
+            public void run()
+            {
+                while (!Thread.interrupted())
+                    try
                     {
-                        while (!Thread.interrupted())
-                            try
-                            {
-                                runOnUiThread(new Runnable() // start actions in UI thread
-                                {
-
-                                    @Override
-                                    public void run(){
-                                        microgear.publish("Topictest", String.valueOf(count)+".  Test message");
-                                        count++;
-                                    }
-                                });
-                                Thread.sleep(2000);
+                        runOnUiThread(new Runnable() // start actions in UI thread
+                        {
+                            @Override
+                            public void run(){
+                                microgear.publish("Topictest", String.valueOf(count)+".  Test message");
+                                count++;
                             }
-                            catch (InterruptedException e)
-                            {
-                                // ooops
-                            }
+                        });
+                        Thread.sleep(2000);
                     }
-                })).start();
+                    catch (InterruptedException e)
+                    {
+                        // ooops
+                    }
             }
-        });
-
-        eventListener.setConnectEventListener(new EventListener.OnServiceConnect() {
-            @Override
-            public void onConnect(Boolean status) {
-                if(status == true){
-                    Message msg = handler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("myKey", "Now I'm connected with netpie");
-                    msg.setData(bundle);
-                    handler.sendMessage(msg);
-                    Log.i("Connected","Now I'm connected with netpie");
-                }
-                else{
-                    Log.i("NotConnect","Can't connect to netpie");
-                }
-            }
-
-        });
-
-        eventListener.setMessageEventListener(new EventListener.OnMessageReceived() {
-            @Override
-            public void onMessage(String topic, String message) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", topic+" : "+message);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("Message",topic+" : "+message);
-                //text.setText(topic+" "+message);
-            }
-        });
-
-        eventListener.setPresentEventListener(new EventListener.OnPresent() {
-            @Override
-            public void onPresent(String name) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "New friend Connect :"+name);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("present","New friend Connect :"+name);
-            }
-        });
-
-        eventListener.setAbsentEventListener(new EventListener.OnAbsent() {
-            @Override
-            public void onAbsent(String name) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "Friend lost :"+name);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("absent","Friend lost :"+name);
-            }
-        });
-
-        eventListener.setDisconnectEventListener(new EventListener.OnClose() {
-            @Override
-            public void onDisconnect(Boolean status) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "Disconnected");
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("disconnect","Disconnected");
-            }
-        });
-
-        eventListener.setOnException(new EventListener.OnException() {
-            @Override
-            public void onException(String error) {
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("myKey", "Exception : "+error);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                Log.i("exception","Exception : "+error);
-            }
-        });
+        })).start();
     }
 
 
@@ -174,6 +83,67 @@ public class MainActivity extends Activity {
         microgear.bindServiceResume();
     }
 
+    class MicrogearCallBack implements MicrogearEventListener{
+        @Override
+        public void onConnect() {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Now I'm connected with netpie");
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("Connected","Now I'm connected with netpie");
+        }
+
+        @Override
+        public void onMessage(String topic, String message) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", topic+" : "+message);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("Message",topic+" : "+message);
+        }
+
+        @Override
+        public void onPresent(String token) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "New friend Connect :"+token);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("present","New friend Connect :"+token);
+        }
+
+        @Override
+        public void onAbsent(String token) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Friend lost :"+token);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("absent","Friend lost :"+token);
+        }
+
+        @Override
+        public void onDisconnect() {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Disconnected");
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("disconnect","Disconnected");
+        }
+
+        @Override
+        public void onError(String error) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Exception : "+error);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("exception","Exception : "+error);
+        }
+    }
 }
 
 ```
@@ -239,55 +209,34 @@ arguments
 Application ที่รันบน microgear จะมีการทำงานในแบบ event driven คือเป็นการทำงานตอบสนองต่อ event ต่างๆ ด้วยการเขียน callback function ขึ้นมารองรับในลักษณะนี้
 
 ```java
-EventListener eventListener = new EventListener();
+MicrogearCallBack callback = new MicrogearCallBack();
 ```
 
 <br/>
 **Event: 'connected'**อีเว้นท์นี้ จะเกิดขึ้นเมื่อ microgear เชื่อมต่อกับ netpie สำเร็จ
 
 ```java
-eventListener.setConnectEventListener(new EventListener.OnServiceConnect() {
-	@Override
-   	public void onConnect(Boolean status) {
-		if(status == true){
-			Log.i("Connected","Now I'm connected with netpie");
-		}
-		else{
-			Log.i("NotConnect","Can't connect to netpie")
-		}
-	}
-});
+public void onConnect() {
+    Log.i("Connected","Now I'm connected with netpie");
+}
 ```
-
-arguments
-
-* *status* `boolean` - สถานะการเชื่อมต่อ
 
 <br/>
-**Event: 'closed'** อีเว้นท์นี้จะเกิดขึ้นเมื่อ microgear ตัดการเชื่อมต่อกับ netpie
+**Event: 'disconnect'** อีเว้นท์นี้จะเกิดขึ้นเมื่อ microgear ตัดการเชื่อมต่อกับ netpie
 
 ```java
-eventListener.setDisconnectEventListener(new EventListener.OnClose() {
-   	@Override
-   	public void onDisconnect(Boolean status) {
-       		Log.i("Disconnect","Disconnect")
-   	}
-});
+public void onDisconnect() {
+    Log.i("disconnect","Disconnected");
+}
 ```
-
-arguments
-
-* *status* `boolean` - สถานะการเชื่อมต่อ
 
 <br/>
 **Event: 'message'** อีเว้นท์นี้จะเกิดเมื่อมี message เข้ามา จะเกิด event นี้ขึ้น พร้อมกับส่งผ่านข้อมูลเกี่ยวกับ message นั้นมาทาง argument ของ callback function
 
 ```java
-eventListener.setMessageEventListener(new EventListener.OnMessageReceived() {
-   	public void onMessage(String topic, String message) {
-		Log.i("Message",topic+" "+message)
-   	}
-});
+public void onMessage(String topic, String message) {
+    Log.i("Message",topic+" : "+message);
+}
 ```
 
 arguments
@@ -299,11 +248,9 @@ arguments
 **Event: 'present'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี microgear ใน appid เดียวกัน online เข้ามาเชื่อมต่อ netpie
 
 ```java
-eventListener.setPresentEventListener(new EventListener.OnPresent() {
-   	public void onPresent(String name) {
-		Log.i("Present",name+ "become online");
-  	}
-});
+public void onPresent(String token) {
+    Log.i("present","New friend Connect :"+token);
+}
 ```
 
 arguments
@@ -314,11 +261,9 @@ arguments
 **Event: 'absent'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี microgear ใน appid เดียวกัน offline หายไป
 
 ```java
-eventListener.setAbsentEventListener(new EventListener.OnAbsent() {
-   	public void onAbsent(String name) {
-		Log.i("Absent",name+ "become offline");
-   	}
-});
+epublic void onAbsent(String token) {
+    Log.i("absent","Friend lost :"+token);
+}
 ```
 
 arguments
@@ -329,11 +274,9 @@ arguments
 **Event: 'error'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี error ขึ้นภายใน microgear
 
 ```java
-eventListener.setOnException(new EventListener.OnException() {
-   	public void onException(String error) {
-		Log.i("Error",error);
-   	}
-});
+public void onError(String error) {
+    Log.i("exception","Exception : "+error);
+}
 ```
 
 arguments

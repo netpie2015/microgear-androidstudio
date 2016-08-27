@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -47,6 +48,11 @@ public class OauthNetpieLibrary extends Activity {
     public String name = "microgear.cache";
     public static SimpleTask simpleTask;
     public static Revoketoken rf;
+    public boolean revokemode = false;
+
+    public void resettoken(){
+        revokemode = true;
+    }
 
     public String create(String APP_ID, String KEY, String SECRET, String path) {
         BufferedReader br;
@@ -61,8 +67,12 @@ public class OauthNetpieLibrary extends Activity {
             while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
+            br.close();
             JSONObject json = new JSONObject(sb.toString());
             chk = json.getJSONObject("_").getString("key");
+            if(revokemode){
+                chk = "";
+            }
             if (chk != null) {
                 if (chk.equals(KEY)) {
                     authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier=NJS1a";
@@ -74,18 +84,10 @@ public class OauthNetpieLibrary extends Activity {
                     return str_result;
 
                 } else {
-                    authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier=NJS1a";
-                    _Key = KEY;
-                    _Secret = SECRET;
-                    authorization = request.OAuth(_Key, _Secret, authorize_callback);
-                    String str_result = new
-                            CheckInvalid().execute("http://ga.netpie.io:8080/api/rtoken").get();
-                    if (str_result.equals("yes")){
-                        rf = new Revoketoken();
-                        rf.execute("http://ga.netpie.io:8080/api/revoke/");
-                    }
-
-                    return str_result;
+                    rf = new Revoketoken();
+                    rf.execute("http://ga.netpie.io:8080/api/revoke/",pathtowrite);
+                    create( APP_ID,  KEY,  SECRET,  path);
+                    return "no";
                 }
 
             }
@@ -125,7 +127,6 @@ public class OauthNetpieLibrary extends Activity {
         FileWriter writer;
         try {
             writer = new FileWriter(pathtowrite);
-            Log.i("path", pathtowrite);
             /** Saving the contents to the file*/
             writer.write(fcontent);
 
@@ -223,47 +224,54 @@ public class OauthNetpieLibrary extends Activity {
 
         protected JSONObject doInBackground(String... params) {
             ReadFile();
-            URL Url;
-            revokecode = revokecode.replaceAll("/", "_");
             try {
-                Url = new URL(params[0] + token + "/" + revokecode);
-                URLConnection conn = Url.openConnection();
-                InputStream re = conn.getInputStream();
-                BufferedReader rd = new BufferedReader(new InputStreamReader(re));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line);
+                if(revokecode!=null) {
+                    revokecode = revokecode.replaceAll("/", "_");
+                    URL url = new URL(params[0] + token + "/" + revokecode);
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                    if(!revokemode){
+                        File file = new File(params[1]);
+                        file.delete();
+                    }
+                    else{
+                        if (con.getResponseCode() == 200) {
+                            File file = new File(params[1]);
+                            file.delete();
+                            revokemode = true;
+                        }
+                    }
                 }
-                rd.close();
-                Log.d("response", response + "");
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
-        public String ReadFile() {
+        public void ReadFile() {
             StringBuilder sb = new StringBuilder();
             String line;
             BufferedReader br;
-            try {
-                FileInputStream fis = new FileInputStream(pathtowrite);
-                br = new BufferedReader(new InputStreamReader(fis));
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
+            File file = new File(pathtowrite);
+            if(file.exists()){
+                try {
+                    FileInputStream fis = new FileInputStream(pathtowrite);
+                    br = new BufferedReader(new InputStreamReader(fis));
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    br.close();
+                    JSONObject json = new JSONObject(sb.toString());
+                    token = json.getJSONObject("_").getJSONObject("accesstoken").getString("token");
+                    revokecode = json.getJSONObject("_").getJSONObject("accesstoken").getString("revokecode");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                JSONObject json = new JSONObject(sb.toString());
-                token = json.getJSONObject("_").getJSONObject("accesstoken").getString("token");
-                revokecode = json.getJSONObject("_").getJSONObject("accesstoken").getString("revokecode");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-            return token;
         }
     }
 

@@ -36,7 +36,7 @@ public class MicrogearService extends Service {
         try {
             connection = new MQTTConnection();
         } catch (IllegalArgumentException e) {
-            Microgear.eventListener.onError("Check format App id ,key and Secret");
+            Microgear.microgeareventListener.onError("Check format App id ,key and Secret");
         }
 
     }
@@ -65,7 +65,7 @@ public class MicrogearService extends Service {
         try {
             connection.start();
         } catch (NullPointerException e) {
-            Microgear.eventListener.onError("Error Check appid,appkey or appsecret");
+            Microgear.microgeareventListener.onError("Error Check appid,appkey or appsecret");
         }
 
 
@@ -301,7 +301,6 @@ public class MicrogearService extends Service {
 					 */
                         client.setCallback(null);
                         if (client.isConnected()) {
-
                                 DisconnectThread Disconnect = new DisconnectThread();
                                 Thread DisconnectThread = new Thread(Disconnect);
                                 DisconnectThread.start();
@@ -318,7 +317,7 @@ public class MicrogearService extends Service {
                             try {
                                 client.connect(options);
                                 connState = CONNECT_STATE.CONNECTED;
-                                Microgear.eventListener.onConnect();
+                                Microgear.microgeareventListener.onConnect();
                                 subscribe("&present");
                                 subscribe("&absent");
                                 ReSubcribeAndPublish();
@@ -326,13 +325,17 @@ public class MicrogearService extends Service {
                             } catch (MqttException e) { // if connect fail
 
                                 if (e.getReasonCode() == 0) {
-                                    Microgear.eventListener.onError("No Internet connection");
+                                    Microgear.microgeareventListener.onError("No Internet connection");
                                     this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                                 } else if (e.getReasonCode() == 5) {
-                                    Microgear.eventListener.onError("Thing is disable");
+                                    Microgear.microgeareventListener.onError("Thing is disable");
                                     this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                                 } else if (e.getReasonCode() == 4) {
-                                    //Microgear.reconnect();
+                                    Microgear.brokereventListener.reconnect();
+                                    Microgear.microgeareventListener.onError("Invalid credential");
+                                    //Microgear microgear = new Microgear(getApplicationContext());
+                                    //microgear.
+                                    //microgear.connect(Microgear.appidvalue, Microgear.keyvalue, Microgear.secretvalue);
                                 }
                                 return;
                             }
@@ -545,7 +548,7 @@ public class MicrogearService extends Service {
 
 
             public void connectionLost(Throwable arg0) {
-                Microgear.eventListener.onError("connection Lost");
+                Microgear.microgeareventListener.onError("connection Lost");
                 connState = CONNECT_STATE.DISCONNECTED;
                 status = "2";
                 sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
@@ -560,11 +563,11 @@ public class MicrogearService extends Service {
                 int pre = topic.indexOf("&present");
                 int ab = topic.indexOf("&absent");
                 if (pre != -1) {
-                    Microgear.eventListener.onPresent(message + "");
+                    Microgear.microgeareventListener.onPresent(message + "");
                 } else if (ab != -1) {
-                    Microgear.eventListener.onAbsent(message + "");
+                    Microgear.microgeareventListener.onAbsent(message + "");
                 } else {
-                    Microgear.eventListener.onMessage(topic, message + "");
+                    Microgear.microgeareventListener.onMessage(topic, message + "");
                 }
 
             }
@@ -620,7 +623,7 @@ public class MicrogearService extends Service {
         public void run() {
             try {
                 client.disconnect();
-                Microgear.eventListener.onDisconnect();
+                Microgear.microgeareventListener.onDisconnect();
             } catch (MqttException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

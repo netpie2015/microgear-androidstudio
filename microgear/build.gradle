@@ -1,5 +1,11 @@
 apply plugin: 'com.android.library'
 
+ext {
+    PUBLISH_GROUP_ID = 'io.netpie'
+    PUBLISH_ARTIFACT_ID = 'microgear'
+    PUBLISH_VERSION = '1.0.1'
+}
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
@@ -25,3 +31,8 @@ dependencies {
     compile files('libs/BASE64Decoder.jar')
     compile files('libs/org.eclipse.paho.client.mqttv3-1.0.2.jar')
 }
+
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+
+
+
