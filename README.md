@@ -4,6 +4,10 @@ microgear-android is a client library for Android Studio.The library is used to 
 
 ##Installation
 -----------
+Refer to the latest version directly from the Jcenter using this tag
+```java
+compile 'io.netpie:microgear:1.0.1'
+```
 <br/>
 
 
@@ -25,9 +29,9 @@ import io.netpie.microgear.MicrogearEventListener;
 public class MainActivity extends Activity {
 
     private Microgear microgear = new Microgear(this);
-    String appid = "APPID"; //APP_ID
-    String key = "KEY"; //KEY
-    String secret = "SERCRET"; //SECRET
+    private String appid = <APPID>; //APP_ID
+    private String key = <KEY>; //KEY
+    private String secret = <SECRET>; //SECRET
     private String alias = "android";
 
     Handler handler = new Handler() {
