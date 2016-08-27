@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="BASE64Decoder">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/netpiegear/libs/BASE64Decoder.jar!/" />
+      <root url="jar://$PROJECT_DIR$/microgear/libs/BASE64Decoder.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
