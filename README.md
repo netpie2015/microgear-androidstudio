@@ -1,12 +1,12 @@
-#Microgear-android 
+#Microgear-android
 -----------
 microgear-android is a client library for Android Studio.The library is used to connect application code with the NETPIE Platform's service for developing IoT applications. For more details on the NETPIE Platform, please visit https://netpie.io .
 
 ##Installation
 -----------
-Refer to the latest version directly from the Jcenter using this tag
+Refer to the latest version directly from the Jcenter using this Gradle 
 ```java
-compile 'io.netpie:microgear:1.0.1'
+compile 'io.netpie:microgear:1.0.2'
 ```
 <br/>
 
@@ -249,8 +249,8 @@ public void onMessage(String topic, String message) {
 
 arguments
 
-* *topic* `string` - topic of message 
-* *message* `string` - message received 
+* *topic* `string` - topic of message
+* *message* `string` - message received
 
 <br/>
 **Event: 'present'** This event is created when there is a microgear under the same appid appears online to connect to NETPIE.
@@ -290,14 +290,3 @@ public void onError(String error) {
 arguments
 
 * *error* `string` - Log error message
-
-
-
-
-
-
-
-
-
-
-

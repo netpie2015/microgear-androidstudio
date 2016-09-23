@@ -230,7 +230,7 @@ public class Microgear extends Activity {
                             data.putCharSequence(MicrogearService.MESSAGE, message);
                             data.putBoolean(MicrogearService.RETAIN, retain);
                             data.putInt(MicrogearService.QOS, qos);
-                            Message msg = Message.obtain(null, MicrogearService.PUBLISH);
+                            Message msg = Message.obtain(null, MicrogearService.PUBLISHRE);
                             msg.setData(data);
                             try {
                                 service.send(msg);
