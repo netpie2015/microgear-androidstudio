@@ -1,5 +1,6 @@
 package io.netpie.microgear;
 
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -165,18 +166,25 @@ public class OAuth1_0a_Access {
 			((HttpURLConnection) conn).setRequestMethod("POST");
 			conn.setDoOutput(true);
 			conn.setRequestProperty("Authorization", authorization);
-			OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-			writer.write(authorization);
-			writer.flush();
-			InputStream is = conn.getInputStream();
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-			StringBuilder response = new StringBuilder();
-			String line;
-			while ((line = rd.readLine()) != null) {
-				response.append(line);
-				token_token_secret.put("", response);
+			conn.connect();
+			int status = ((HttpURLConnection) conn).getResponseCode();
+
+			if(status >= HttpURLConnection.HTTP_BAD_REQUEST) {
+				Log.i(getClass().getCanonicalName(),"Error HTTP Code "+status);
+
 			}
-			rd.close();
+
+			if(status==HttpURLConnection.HTTP_OK) {
+				InputStream is = conn.getInputStream();
+				BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+				StringBuilder response = new StringBuilder();
+				String line;
+				while ((line = rd.readLine()) != null) {
+					response.append(line);
+					token_token_secret.put("", response);
+				}
+				rd.close();
+			}
 			return token_token_secret;
 		} catch (IOException e) {
 			e.printStackTrace();
