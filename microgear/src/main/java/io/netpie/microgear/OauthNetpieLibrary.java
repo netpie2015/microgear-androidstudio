@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
@@ -160,7 +159,7 @@ public class OauthNetpieLibrary extends Activity {
                     Log.i(getClass().getCanonicalName(),"Unauthorized "+status);
                 }
 
-                if(status==HttpURLConnection.HTTP_OK) {
+                if(status== HttpURLConnection.HTTP_OK) {
                     InputStream is = conn.getInputStream();
                     BufferedReader rd = new BufferedReader(new InputStreamReader(is));
                     StringBuilder response = new StringBuilder();

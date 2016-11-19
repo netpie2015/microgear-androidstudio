@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -119,7 +118,7 @@ public class OAuth1_0a_Access {
 	}
 
 	public String _prepareParameters(String oauth_token, String oauth_token_secret, String method, String url,
-			String extra_params) {
+									 String extra_params) {
 
 		String timestamp = Integer.toString(_getTimestamp());
 		String[] headers_key = {"oauth_consumer_key", "oauth_nonce", "oauth_signature_method",
@@ -157,7 +156,7 @@ public class OAuth1_0a_Access {
 	}
 
 	public JSONObject _performSecureRequest(String oauth_token, String oauth_token_secret, String method, String url,
-			String extraParams) {
+											String extraParams) {
 		String authorization = _prepareParameters(oauth_token, oauth_token_secret, method, url, extraParams);
 		URL Url;
 		try {
@@ -174,7 +173,7 @@ public class OAuth1_0a_Access {
 
 			}
 
-			if(status==HttpURLConnection.HTTP_OK) {
+			if(status== HttpURLConnection.HTTP_OK) {
 				InputStream is = conn.getInputStream();
 				BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 				StringBuilder response = new StringBuilder();

@@ -39,7 +39,6 @@ public class Microgear extends Activity {
     public IntentFilter intentFilter;
     public OauthNetpieLibrary oauthNetpieLibrary = new OauthNetpieLibrary();
     public MicrogearService senddatatoservice = new MicrogearService();
-    public String name = "microgear.cache";
     public static String appidvalue, keyvalue, secretvalue;
     public File tempFile;
     public File cDir;
@@ -68,12 +67,12 @@ public class Microgear extends Activity {
         public String Topic;
         public String Message;
 
-        public Publish(String Topic,String Message){
+        public Publish(String Topic, String Message){
             this.Topic = Topic;
             this.Message = Message;
         }
     }
-    public void connect(String appid, String key, String secret,String alias) {
+    public void connect(String appid, String key, String secret, String alias) {
         connect( appid, key, secret);
         setalias(alias);
     }
@@ -87,7 +86,7 @@ public class Microgear extends Activity {
             secretvalue = secret;
 
             cDir = context.getCacheDir();
-            tempFile = new File(cDir.getPath() + "/" + name);
+            tempFile = new File(cDir.getPath() + "/microgear" + key +".cache");
 
 
             if (isConnectingToInternet()) {
@@ -404,7 +403,7 @@ public class Microgear extends Activity {
     }
 
     private String Checktopic(String Topic) {
-        Pattern p = Pattern.compile("[^A-Za-z0-9/_]");
+        Pattern p = Pattern.compile("[^A-Za-z0-9/_+#]");
         if (!p.matcher(Topic).find() && !Topic.isEmpty()) {
             Pattern p1 = Pattern.compile("[\\._/]");
             if(p1.matcher(Topic).find()){
@@ -442,7 +441,7 @@ public class Microgear extends Activity {
         }
     };
 
-    class BrokerCallBack implements BrokerEventListener{
+    class BrokerCallBack implements BrokerEventListener {
         @Override
         public void reconnect() {
             oauthNetpieLibrary.resettoken();
