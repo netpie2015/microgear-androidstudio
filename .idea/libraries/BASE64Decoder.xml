@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="BASE64Decoder">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/microgear/libs/BASE64Decoder.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -6,7 +6,7 @@ microgear-android คือ client library สำหรับ Android Studio ท
 -----------
 สามารถเรียกใช้เวอร์ชั่นล่าสุดจาก Jcenter โดยใช้ Gradle 
 ```java
-compile 'io.netpie:microgear:1.0.5'
+compile 'io.netpie:microgear:1.1.0'
 ```
 <br/>
 
@@ -147,6 +147,16 @@ public class MainActivity extends Activity {
             handler.sendMessage(msg);
             Log.i("exception","Exception : "+error);
         }
+
+        @Override
+        public void onInfo(String info) {
+            Message msg = handler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("myKey", "Exception : "+info);
+            msg.setData(bundle);
+            handler.sendMessage(msg);
+            Log.i("info","Info : "+info);
+        }
     }
 }
 
@@ -206,6 +216,15 @@ arguments
 
 <br/>
 **microgear.disconnect();** การ Disconnect หยุดเชื่อมต่อกับ netpie
+
+<br/>
+**microgear.wrtieFeed(*feedid*, *data*, *apikey*):** เขียนข้อมูลลง feed storage
+
+arguments
+
+* *feedid* `string` - ชื่อของ feed ที่ต้องการจะเขียนข้อมูล
+* *data* `jsonobject` – ข้อมูลที่จะบันทึก ในรูปแบบ JSONObject
+* *apikey* `string` - apikey สำหรับตรวจสอบสิทธิ์ หากไม่กำหนด จะใช้ default apikey ของ feed ที่ให้สิทธิ์ไว้กับ AppID
 
 
 ###Events
@@ -286,3 +305,16 @@ public void onError(String error) {
 arguments
 
 * *error* `string` - ข้อความที่แสดง error
+
+<br/>
+**Event: 'info'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี info ขึ้นภายใน microgear
+
+```java
+public void onInfo(String info) {
+    Log.i("info","info : "+info);
+}
+```
+
+arguments
+
+* *info* `string` - ข้อความที่แสดง info
