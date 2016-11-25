@@ -14,6 +14,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +27,9 @@ import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
@@ -372,6 +375,30 @@ public class Microgear extends Activity {
             microgeareventListener.onError("No internet connection");
         }
     }
+    public void writeFeed(String feedid,JSONObject  data) {
+        String feedTopic="/@writefeed/"+feedid;
+        //String stringData = data.toString().substring(1, data.toString().length() - 1);
+        Iterator<String> iter = data.keys();
+        String stringData = "{";
+        while (iter.hasNext()) {
+            String key = iter.next();
+            stringData += "\""+key+"\"";
+            try {
+                Object value = data.get(key);
+                stringData += ":"+value+",";
+            } catch (JSONException e) {
+                // Something went wrong!
+            }
+        }
+        stringData = stringData.substring(0, stringData.length()-1);
+        stringData += "}";
+        //JSONArray datajson = new JSONArray(Arrays.asList(stringdata));
+        publish(feedTopic,stringData);
+    }
+
+    public void writeFeed(String feedid,JSONObject  data,String feedkey) {
+        this.writeFeed(feedid+"/"+feedkey,data);
+    }
 
 
     private boolean isConnectingToInternet() {
@@ -403,7 +430,7 @@ public class Microgear extends Activity {
     }
 
     private String Checktopic(String Topic) {
-        Pattern p = Pattern.compile("[^A-Za-z0-9/_+#]");
+        Pattern p = Pattern.compile("[^A-Za-z0-9/_+#@]");
         if (!p.matcher(Topic).find() && !Topic.isEmpty()) {
             Pattern p1 = Pattern.compile("[\\._/]");
             if(p1.matcher(Topic).find()){
@@ -413,7 +440,7 @@ public class Microgear extends Activity {
                 return Topic;
             }
         } else {
-            microgeareventListener.onError("name must be A-Z,a-z,0-9,_ and must not spaces.");
+            microgeareventListener.onError("topic must be A-Z,a-z,0-9,_,#,+ and must not spaces.");
             return null;
         }
     }

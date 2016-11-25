@@ -562,11 +562,21 @@ public class MicrogearService extends Service {
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 int pre = topic.indexOf("&present");
                 int ab = topic.indexOf("&absent");
+                int error = topic.indexOf("@error");
+                int info = topic.indexOf("@info");
                 if (pre != -1) {
                     Microgear.microgeareventListener.onPresent(message + "");
-                } else if (ab != -1) {
+                }
+                else if (ab != -1) {
                     Microgear.microgeareventListener.onAbsent(message + "");
-                } else {
+                }
+                else if (error != -1) {
+                    Microgear.microgeareventListener.onError(message + "");
+                }
+                else if (info != -1) {
+                    Microgear.microgeareventListener.onInfo(message + "");
+                }
+                else {
                     Microgear.microgeareventListener.onMessage(topic, message + "");
                 }
 

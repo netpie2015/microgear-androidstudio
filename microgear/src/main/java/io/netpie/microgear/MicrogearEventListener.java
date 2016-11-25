@@ -10,4 +10,5 @@ public interface MicrogearEventListener {
     public void onAbsent(String token);
     public void onDisconnect();
     public void onError(String error);
+    public void onInfo(String info);
 }
