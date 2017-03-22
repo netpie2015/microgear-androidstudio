@@ -176,6 +176,7 @@ arguments
 *  *secret* `string` - เป็น secret ของ key ซึ่งจะใช้ประกอบในกระบวนการยืนยันตัวตน
 
 <br/>
+
 **microgear.publish(topic, message,qos,retained);**  การ Publish ในกรณีที่ต้องการส่งข้อความแบบไม่เจาะจงผู้รับ สามารถใช้ฟังชั่น publish ไปยัง topic ที่กำหนดได้ ซึ่งจะมีแต่ microgear ที่ subscribe topoic นี้เท่านั้น ที่จะได้รับข้อความ
 
 arguments
@@ -186,6 +187,7 @@ arguments
 * *retained* `Boolean` - ให้ retain ข้อความไว้หรือไม่ default เป็น false
 
 <br/>
+
 **microgear.subscribe(topic);**  การ Subscribe ในการทำงาน microgear อาจจะมีความสนใจ topic ใดเป็นการเฉพาะ เราสามารถใช้ฟังก์ชั่น subscribe() ในการบอกรับ message ของ topic นั้นได้ และหาก topic นั้นเคยมีการ retain ข้อความไว้ microgear จะได้รับข้อความนั้นทุกครั้งที่ subscribe topic
 
 arguments
@@ -193,6 +195,7 @@ arguments
 * *topic* `string` - ชื่อของ topic ที่ต้องการจะรอรับข้อความ
 
 <br/>
+
 **microgear.unsubscribe(topic);**  การยกเลิกการ subscribe
 
 arguments
@@ -200,6 +203,7 @@ arguments
 * *topic* `string` - ชื่อของ topic ที่ไม่ต้องการจะรอรับข้อความ
 
 <br/>
+
 **microgear.setalias(name);**  การตั้งชื่อ โดย microgear สามารถตั้งนามแฝงของตัวเองได้ ซึ่งสามารถใช้เป็นชื่อให้คนอื่นเรียกในการใช้ฟังก์ชั่น chat() และชื่อที่ตั้งในโค้ด จะไปปรากฎบนหน้าจัดการ key บนเว็บ netpie.io อย่างอัตโนมัติ
 
 arguments
@@ -207,6 +211,7 @@ arguments
 * *name* `string` - ชื่อของ microgear นี้
 
 <br/>
+
 **microgear.chat(name,message);** การ chat โดย microgear สามารถส่งข้อความแบบเจาะจงถึงผู้รับด้วยการระบุ name ที่ microgear ตัวอื่นเคย setalias ไว้
 
 arguments
@@ -215,9 +220,11 @@ arguments
 * *message* `string` - ข้อความ
 
 <br/>
+
 **microgear.disconnect();** การ Disconnect หยุดเชื่อมต่อกับ netpie
 
 <br/>
+
 **microgear.wrtieFeed(*feedid*, *data*, *apikey*):** เขียนข้อมูลลง feed storage
 
 arguments
@@ -236,6 +243,7 @@ MicrogearCallBack callback = new MicrogearCallBack();
 ```
 
 <br/>
+
 **Event: 'connected'** อีเว้นท์นี้ จะเกิดขึ้นเมื่อ microgear เชื่อมต่อกับ netpie สำเร็จ
 
 ```java
@@ -245,6 +253,7 @@ public void onConnect() {
 ```
 
 <br/>
+
 **Event: 'disconnect'** อีเว้นท์นี้จะเกิดขึ้นเมื่อ microgear ตัดการเชื่อมต่อกับ netpie
 
 ```java
@@ -254,6 +263,7 @@ public void onDisconnect() {
 ```
 
 <br/>
+
 **Event: 'message'** อีเว้นท์นี้จะเกิดเมื่อมี message เข้ามา จะเกิด event นี้ขึ้น พร้อมกับส่งผ่านข้อมูลเกี่ยวกับ message นั้นมาทาง argument ของ callback function
 
 ```java
@@ -268,6 +278,7 @@ arguments
 * *message* `string` - ข้อความที่เข้ามา
 
 <br/>
+
 **Event: 'present'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี microgear ใน appid เดียวกัน online เข้ามาเชื่อมต่อ netpie
 
 ```java
@@ -281,6 +292,7 @@ arguments
 * *name* `string` - ชื่อของ microgear ใน appid เดียวกันที่ online
 
 <br/>
+
 **Event: 'absent'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี microgear ใน appid เดียวกัน offline หายไป
 
 ```java
@@ -294,6 +306,7 @@ arguments
 * *name* `string` - ชื่อของ microgear ใน appid เดียวกันที่ offline
 
 <br/>
+
 **Event: 'error'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี error ขึ้นภายใน microgear
 
 ```java
@@ -307,6 +320,7 @@ arguments
 * *error* `string` - ข้อความที่แสดง error
 
 <br/>
+
 **Event: 'info'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี info ขึ้นภายใน microgear
 
 ```java
