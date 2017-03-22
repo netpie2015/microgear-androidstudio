@@ -167,7 +167,7 @@ public class MainActivity extends Activity {
 ### Microgear
 -----------
 
-** microgear.connect(appid, key, secret); **  การ Connect สำหรับเริ่มต้นการทำงาน microgear จะต้องทำการเชื่อมต่อไปที่ NETPIE
+* * microgear.connect(appid, key, secret); **  การ Connect สำหรับเริ่มต้นการทำงาน microgear จะต้องทำการเชื่อมต่อไปที่ NETPIE
 
 arguments
 
