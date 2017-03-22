@@ -357,6 +357,9 @@ public class OauthNetpieLibrary extends Activity {
             byte[] result = mac.doFinal(access_token.getBytes());
             BASE64Encoder encoder = new BASE64Encoder();
             hash = encoder.encode(result);
+
+        }catch (NullPointerException e) {
+            e.printStackTrace();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
