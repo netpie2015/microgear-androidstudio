@@ -2,7 +2,7 @@
 -----------
 microgear-android is a client library for Android Studio.The library is used to connect application code with the NETPIE Platform's service for developing IoT applications. For more details on the NETPIE Platform, please visit https://netpie.io .
 
-##Installation
+## Installation
 -----------
 Refer to the latest version directly from the Jcenter using this Gradle 
 ```java
