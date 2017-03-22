@@ -1,4 +1,4 @@
-#Microgear-android
+# Microgear-android
 -----------
 microgear-android is a client library for Android Studio.The library is used to connect application code with the NETPIE Platform's service for developing IoT applications. For more details on the NETPIE Platform, please visit https://netpie.io .
 
@@ -13,7 +13,7 @@ compile 'io.netpie:microgear:1.1.1'
 
 
 
-##Usage Example
+## Usage Example
 -----------
 ```java
 
@@ -165,9 +165,9 @@ public class MainActivity extends Activity {
 
 ```
 
-##Library Usage
+## Library Usage
 -----------
-###Microgear
+### Microgear
 -----------
 
 
@@ -180,6 +180,7 @@ arguments
 *  *secret* `string` - comes in a pair with key. The secret is used for authentication and integrity.
 
 <br/>
+
 **microgear.publish(topic, message,qos,retained);**  In the case that the microgear want to send a message to an unspecified receiver, the developer can use the function publish to the desired topic, which all the microgears that subscribe such topic will receive a message.
 
 arguments
@@ -190,6 +191,7 @@ arguments
 * *retained* `Boolean` - retain a message or not (the default is false)
 
 <br/>
+
 **microgear.subscribe(topic);**  microgear may be interested in some topic. The developer can use the function subscribe() to subscribe a message belong to such topic. If the topic used to retain a message, the microgear will receive a message everytime it subscribes that topic.
 
 arguments
@@ -197,6 +199,7 @@ arguments
 * *topic* `string` - name of topic to waiting for a message .
 
 <br/>
+
 **microgear.unsubscribe(topic);** cancel subscription
 
 arguments
@@ -204,6 +207,7 @@ arguments
 * *topic* `string` -  name of the topic to which to don't wait for a message.
 
 <br/>
+
 **microgear.setalias(name);**  microgear can set its own alias, which to be used for others make a function call chat(). The alias will appear on the key management portal of netpie.io .
 
 arguments
@@ -211,6 +215,7 @@ arguments
 * *name* `string` - name of this microgear.
 
 <br/>
+
 **microgear.chat(name,message);** sending a message to a specified gearname
 
 arguments
@@ -219,9 +224,11 @@ arguments
 * *message* `string` - message to be sent.
 
 <br/>
+
 **microgear.disconnect();** Disconnect to NETPIE.
 
 <br/>
+
 **microgear.wrtieFeed(*feedid*, *data*, *apikey*):** write time series data to a feed storage
 
 arguments
@@ -231,7 +238,7 @@ arguments
 * *apikey* `string` - apikey for authorization. If apikey is not specified, you will need to allow the AppID to access feed and then the default apikey will be assigned automatically.
 
 
-###Events
+### Events
 -----------
 An application that runs on a microgear is an event-driven type, which responses to various events with the callback function in a form of event function call.
 
@@ -240,6 +247,7 @@ MicrogearCallBack callback = new MicrogearCallBack();
 ```
 
 <br/>
+
 **Event: 'connected'** This event is created when the microgear library successfully connects to the NETPIE platform.
 
 ```java
@@ -249,6 +257,7 @@ public void onConnect() {
 ```
 
 <br/>
+
 **Event: 'disconnect'** This event is created when the microgear library disconnects the NETPIE platform.
 
 ```java
@@ -258,6 +267,7 @@ public void onDisconnect() {
 ```
 
 <br/>
+
 **Event: 'message'** When there is an incoming message, this event is created with the related information to be sent via the callback function.
 
 ```java
@@ -272,6 +282,7 @@ arguments
 * *message* `string` - message received
 
 <br/>
+
 **Event: 'present'** This event is created when there is a microgear under the same appid appears online to connect to NETPIE.
 
 ```java
@@ -285,6 +296,7 @@ arguments
 *name* `string` - Name of microgear under the same appid appears online
 
 <br/>
+
 **Event: 'absent'** This event is created when the microgear under the same appid appears offline.
 
 ```java
@@ -298,6 +310,7 @@ arguments
 * *name* `string` - Name of microgear under the same appid appears offline
 
 <br/>
+
 **Event: 'error'** This event is created when an error occurs within a microgear.
 
 ```java
@@ -311,7 +324,8 @@ arguments
 * *error* `string` - Log error message
 
 <br/>
-**Event: 'info'** อีเว้นท์นี้จะเกิดขึ้นเมื่อมี info ขึ้นภายใน microgear
+
+**Event: 'info'** This event is created when there is some event occurs within a microgear
 
 ```java
 public void onInfo(String info) {
@@ -321,4 +335,4 @@ public void onInfo(String info) {
 
 arguments
 
-* *info* `string` - ข้อความที่แสดง info
+* *info* `string` - A message related to this event.
