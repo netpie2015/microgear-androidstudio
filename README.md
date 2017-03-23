@@ -229,6 +229,10 @@ arguments
 
 <br/>
 
+**microgear.resettoken();** For deleting Token in cache and on the platform. If deleted, need to get a new Token for the next connection.
+
+<br/>
+
 **microgear.wrtieFeed(*feedid*, *data*, *apikey*):** write time series data to a feed storage
 
 arguments
