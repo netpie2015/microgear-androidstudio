@@ -225,6 +225,10 @@ arguments
 
 <br/>
 
+**microgear.resettoken();** สำหรับต้องการลบ Token ที่มีอยู่ ซึ่งจะทำการลบ Token ที่อยู่ภายใน cache และบน platform เมื่อลบแล้ว จำเป็นจะต้องขอ Token ใหม่ทุกครั้ง
+
+<br/>
+
 **microgear.wrtieFeed(*feedid*, *data*, *apikey*):** เขียนข้อมูลลง feed storage
 
 arguments
