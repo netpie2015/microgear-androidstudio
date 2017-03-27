@@ -32,6 +32,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import Decoder.BASE64Encoder;
 
+import static io.netpie.microgear.Microgear.alias;
+
 public class OauthNetpieLibrary extends Activity {
     public String pathtowrite;
     public String authorize_callback;
@@ -44,16 +46,18 @@ public class OauthNetpieLibrary extends Activity {
     public static JSONObject file2 = new JSONObject();
     public static JSONObject file3 = new JSONObject();
     public static String End_point = "pie://gb.netpie.io:1883";
-    public String name = "microgear.cache";
+    // String name = "microgear.cache";
     public static SimpleTask simpleTask;
     public static Revoketoken rf;
     public boolean revokemode = false;
+    public String varifier = "NJS1a";
+    private boolean checkalias = false;
 
     public void resettoken(){
         revokemode = true;
     }
 
-    public String create(String APP_ID, String KEY, String SECRET, String path) {
+    public String create(String APP_ID, String KEY, String SECRET, String path, String alias) {
         BufferedReader br;
         StringBuilder sb = new StringBuilder();
         pathtowrite = path;
@@ -74,7 +78,11 @@ public class OauthNetpieLibrary extends Activity {
             }
             if (chk != null) {
                 if (chk.equals(KEY)) {
-                    authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier=NJS1a";
+                    if(!alias.isEmpty()){
+                        checkalias = true;
+                        varifier = alias;
+                    }
+                    authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier="+varifier;
                     _Key = KEY;
                     _Secret = SECRET;
                     authorization = request.OAuth(_Key, _Secret, authorize_callback);
@@ -85,7 +93,7 @@ public class OauthNetpieLibrary extends Activity {
                 } else {
                     rf = new Revoketoken();
                     rf.execute("http://ga.netpie.io:8080/api/revoke/",pathtowrite);
-                    create( APP_ID,  KEY,  SECRET,  path);
+                    create( APP_ID,  KEY,  SECRET,  path, alias);
                     return "no";
                 }
 
@@ -93,8 +101,10 @@ public class OauthNetpieLibrary extends Activity {
 
 
         } catch (FileNotFoundException e) {
-
-            authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier=NJS1a";
+            if(!alias.isEmpty()){
+                varifier = alias;
+            }
+            authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier="+varifier;
             _Key = KEY;
             _Secret = SECRET;
 
@@ -152,7 +162,7 @@ public class OauthNetpieLibrary extends Activity {
                 conn.setDoOutput(true);
                 conn.setRequestProperty("Authorization", authorization);
                 conn.connect();
-                
+
                 int status = ((HttpURLConnection) conn).getResponseCode();
 
                 if(status >= HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -197,7 +207,7 @@ public class OauthNetpieLibrary extends Activity {
                 conn.setReadTimeout(3000);
                 conn.setRequestProperty("Authorization", authorization);
                 conn.connect();
-                
+
                 InputStream is = conn.getInputStream();
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is));
                 StringBuilder response = new StringBuilder();
@@ -232,21 +242,27 @@ public class OauthNetpieLibrary extends Activity {
             ReadFile();
             try {
                 if(revokecode!=null) {
-                    revokecode = revokecode.replaceAll("/", "_");
-                    URL url = new URL(params[0] + token + "/" + revokecode);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    if(token!=null){
+                        revokecode = revokecode.replaceAll("/", "_");
+                        URL url = new URL(params[0] + token + "/" + revokecode);
+                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-                    if(!revokemode){
+                        if(!revokemode){
+                            File file = new File(params[1]);
+                            file.delete();
+                        }
+                        else{
+                            if (con.getResponseCode() == 200) {
+                                File file = new File(params[1]);
+                                file.delete();
+                                revokemode = true;
+                            }
+                        }
+                    }else{
                         File file = new File(params[1]);
                         file.delete();
                     }
-                    else{
-                        if (con.getResponseCode() == 200) {
-                            File file = new File(params[1]);
-                            file.delete();
-                            revokemode = true;
-                        }
-                    }
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -268,7 +284,12 @@ public class OauthNetpieLibrary extends Activity {
                     }
                     br.close();
                     JSONObject json = new JSONObject(sb.toString());
-                    token = json.getJSONObject("_").getJSONObject("accesstoken").getString("token");
+
+                    try{
+                        token = json.getJSONObject("_").getJSONObject("accesstoken").getString("token");
+                    }catch (JSONException e) {
+                        token = null;
+                    }
                     revokecode = json.getJSONObject("_").getJSONObject("accesstoken").getString("revokecode");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -309,6 +330,8 @@ public class OauthNetpieLibrary extends Activity {
                 query_pairs.put(pair.substring(idxs, idxe), pair.substring(idxe + 1, pair.length() - 2));
             } else if (i != 0) {
                 query_pairs.put(pair.substring(idxs, idxe), pair.substring(idxe + 1));
+            } else if (i == 0){
+                query_pairs.put("flag", pair.substring(idxe + 1));
             }
             i++;
         }
@@ -322,23 +345,37 @@ public class OauthNetpieLibrary extends Activity {
             request = splitQuery_Request(Request_token);
             String request_token = request.get("oauth_token");
             String request_token_secret = request.get("oauth_token_secret");
-            JSONObject Request_Access_token = new OAuth1_0a_Access().OAuth(_Key, _Secret, request_token,
-                    request_token_secret);
+            JSONObject Request_Access_token;
+            if(!varifier.equals("NJS1a")){
+                Request_Access_token = new OAuth1_0a_Access().OAuth(_Key, _Secret, request_token,
+                        request_token_secret,varifier);
+            }
+            else{
+                Request_Access_token = new OAuth1_0a_Access().OAuth(_Key, _Secret, request_token,
+                        request_token_secret);
+            }
+
             access = splitQuery_Access(Request_Access_token);
             String access_token = access.get("oauth_token");
             String access_token_secret = access.get("oauth_token_secret");
             String revoketoken = Signature(_Secret, access_token_secret, access_token);
-            file.putOpt("key", _Key);
-            file.put("requesttoken", "null");
-            file2.put("token", access_token);
-            file2.put("secret", access_token_secret);
-            file2.put("endpoint", End_point);
-            file2.put("revokecode", revoketoken);
-            file.put("accesstoken", file2);
-            file3.put("_", file);
-            String g = file3.toString();
-            String f = g.replace("\\/", "/");
-            write(f);
+            if(access.get("flag")!="S"){
+                file.putOpt("key", _Key);
+                file.put("requesttoken", "null");
+                file2.put("token", access_token);
+                file2.put("secret", access_token_secret);
+                file2.put("endpoint", End_point);
+                file2.put("revokecode", revoketoken);
+                file.put("accesstoken", file2);
+                file3.put("_", file);
+                String g = file3.toString();
+                String f = g.replace("\\/", "/");
+                write(f);
+            }
+            else{
+                File file = new File(pathtowrite);
+                file.delete();
+            }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -357,8 +394,12 @@ public class OauthNetpieLibrary extends Activity {
             byte[] result = mac.doFinal(access_token.getBytes());
             BASE64Encoder encoder = new BASE64Encoder();
             hash = encoder.encode(result);
-
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
+            try{
+                Microgear.microgeareventListener.onError("Error please check appid,appkey,appsecret or your credit");
+            }catch (NullPointerException i){
+                //null
+            }
             e.printStackTrace();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
