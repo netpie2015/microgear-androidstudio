@@ -38,6 +38,10 @@ public class OAuth1_0a_Access {
 	private String oauth_token_secret;
 	public String Verifier = "NJS1a";
 
+	public JSONObject OAuth(String consumerKey, String consumerSecret, String oauth_token, String oauth_token_secret,String alias) {
+		Verifier = alias;
+		return OAuth( consumerKey,  consumerSecret,  oauth_token,  oauth_token_secret);
+	}
 	public JSONObject OAuth(String consumerKey, String consumerSecret, String oauth_token, String oauth_token_secret) {
 		this._consumerKey = consumerKey;
 		this.oauth_token = oauth_token;
@@ -127,7 +131,7 @@ public class OAuth1_0a_Access {
 				oauth_token, Verifier, version ,""};
 
 		String sig;
-		sig = _getSignature(method, url, this._normaliseRequestParams(headers_key, headers_value), oauth_token_secret);		
+		sig = _getSignature(method, url, this._normaliseRequestParams(headers_key, headers_value), oauth_token_secret);
 		headers_value[headers_value.length-1] = sig;
 		String authorization = this._buildAuthorizationHeaders(headers_key, headers_value);
 		return authorization;
@@ -170,7 +174,6 @@ public class OAuth1_0a_Access {
 
 			if(status >= HttpURLConnection.HTTP_BAD_REQUEST) {
 				Log.i(getClass().getCanonicalName(),"Error HTTP Code "+status);
-
 			}
 
 			if(status== HttpURLConnection.HTTP_OK) {

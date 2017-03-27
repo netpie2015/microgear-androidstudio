@@ -257,7 +257,7 @@ public class MicrogearService extends Service {
             public ArrayList<Microgear.Publish> PublishList;
             public ArrayList<String> SubscribeList;
             public ArrayList<String> UnsubscribeList;
-            public String Namedrive = null;
+            public String alais = null;
             public int qos = 0;
 
             public MsgHandler() {
@@ -277,9 +277,9 @@ public class MicrogearService extends Service {
                 SubscribeList = Microgear.SubscribeList;
                 PublishList = Microgear.PublishList;
                 UnsubscribeList = Microgear.UnsubscribeList;
-                Namedrive = Microgear.Namedrive;
-                if (Namedrive != null) {
-                    setalias(Namedrive);
+                String alias = Microgear.alias;
+                if (alias != null) {
+                    setalias(alias);
                 }
                 for (String i : SubscribeList) {
                     subscribe(i);
@@ -301,13 +301,9 @@ public class MicrogearService extends Service {
 					 */
                         client.setCallback(null);
                         if (client.isConnected()) {
-                                DisconnectThread Disconnect = new DisconnectThread();
-                                Thread DisconnectThread = new Thread(Disconnect);
-                                DisconnectThread.start();
-                                //client.disconnect();
-                                //client.close();
-                                //EventListener.onDisconnect();
-
+                            DisconnectThread Disconnect = new DisconnectThread();
+                            Thread DisconnectThread = new Thread(Disconnect);
+                            DisconnectThread.start();
                         }
                         break;
                     }
@@ -333,9 +329,6 @@ public class MicrogearService extends Service {
                                 } else if (e.getReasonCode() == 4) {
                                     Microgear.brokereventListener.reconnect();
                                     Microgear.microgeareventListener.onError("Invalid credential");
-                                    //Microgear microgear = new Microgear(getApplicationContext());
-                                    //microgear.
-                                    //microgear.connect(Microgear.appidvalue, Microgear.keyvalue, Microgear.secretvalue);
                                 }
                                 return;
                             }
@@ -424,9 +417,9 @@ public class MicrogearService extends Service {
                         if (b != null) {
                             CharSequence cs = b.getCharSequence(TOPIC);
                             if (cs != null) {
-                                String namedevice = cs.toString().trim();
-                                if (namedevice.isEmpty() == false) {
-                                    setalias(namedevice);
+                                String alias = cs.toString().trim();
+                                if (alias.isEmpty() == false) {
+                                    setalias(alias);
                                 }
                             }
                         }
@@ -437,13 +430,13 @@ public class MicrogearService extends Service {
                         if (b != null) {
                             CharSequence cs = b.getCharSequence(TOPIC);
                             if (cs != null) {
-                                String namedevice = cs.toString().trim();
-                                if (namedevice.isEmpty() == false) {
+                                String alias = cs.toString().trim();
+                                if (alias.isEmpty() == false) {
                                     cs = b.getCharSequence(MESSAGE);
                                     if (cs != null) {
                                         String message = cs.toString().trim();
                                         if (message.isEmpty() == false) {
-                                            chat(namedevice, message);
+                                            chat(alias, message);
                                         }
                                     }
                                 }
@@ -480,35 +473,29 @@ public class MicrogearService extends Service {
                 SubscribeThread Subcribe = new SubscribeThread("/" + appid1 + "/" + topic);
                 Thread SubscribeThread = new Thread(Subcribe);
                 SubscribeThread.start();
-                //client.subscribe("/" + appid1 + "/" + topic);
-                //eventListener.mError.onException("/" + appid1 + "/" + topic);
 
             }
 
 
-            public void setalias(String namedevice) {
+            public void setalias(String alias) {
                 String msg = "";
                 MqttMessage message = new MqttMessage();
                 message.setQos(qos);
                 message.setPayload(msg.getBytes());
-                PublishThread publish = new PublishThread("/" + appid1 + "/" + "@setalias/" + namedevice, message);
+                PublishThread publish = new PublishThread("/" + appid1 + "/" + "@setalias/" + alias, message);
                 Thread PublishThread = new Thread(publish);
                 PublishThread.start();
-                //client.publish("/" + appid1 + "/" + "@setalias/" + namedevice, message);
-                //eventListener.mError.onException("Setname Complete");
 
             }
 
-            public void chat(String namedevice, String msg) {
+            public void chat(String alias, String msg) {
 
                 MqttMessage message = new MqttMessage();
                 message.setQos(qos);
                 message.setPayload(msg.getBytes());
-                PublishThread publish = new PublishThread("/" + appid1 + "/" + "gearname/" + namedevice, message);
+                PublishThread publish = new PublishThread("/" + appid1 + "/" + "gearname/" + alias, message);
                 Thread PublishThread = new Thread(publish);
                 PublishThread.start();
-                //client.publish("/" + appid1 + "/" + "gearname/" + namedevice, message);
-                //eventListener.mError.onException("Chat Complete");
 
             }
 
@@ -520,10 +507,6 @@ public class MicrogearService extends Service {
                 PublishThread publish = new PublishThread("/" + appid1 + "/" + topic, message);
                 Thread PublishThread = new Thread(publish);
                 PublishThread.start();
-                //client.publish("/" + appid1 + "/" + topic, message);
-                //eventListener.mError.onException("Publish Complete");
-
-
             }
 
             public void publish(String topic, String msg, Boolean retain) {
@@ -581,7 +564,6 @@ public class MicrogearService extends Service {
                 }
 
             }
-
 
         }
 

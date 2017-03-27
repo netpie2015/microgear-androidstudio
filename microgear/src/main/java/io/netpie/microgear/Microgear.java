@@ -45,12 +45,12 @@ public class Microgear extends Activity {
     public static String appidvalue, keyvalue, secretvalue;
     public File tempFile;
     public File cDir;
-    static String Namedrive=null;
     static ArrayList<Publish> PublishList = new ArrayList<Publish>();
     static ArrayList<String> SubscribeList = new ArrayList<String>();
     static ArrayList<String> UnsubscribeList = new ArrayList<String>();
     static MicrogearEventListener microgeareventListener ;
     static BrokerEventListener brokereventListener ;
+    static String alias = null;
 
     public void resettoken(){
         oauthNetpieLibrary.resettoken();
@@ -76,8 +76,8 @@ public class Microgear extends Activity {
         }
     }
     public void connect(String appid, String key, String secret, String alias) {
+        this.alias = alias;
         connect( appid, key, secret);
-        setalias(alias);
     }
 
     public void connect(String appid, String key, String secret) {
@@ -93,8 +93,7 @@ public class Microgear extends Activity {
 
 
             if (isConnectingToInternet()) {
-
-                String a = oauthNetpieLibrary.create(appid, key, secret, tempFile.toString());
+                String a = oauthNetpieLibrary.create(appid, key, secret, tempFile.toString(),alias);
                 if (a.equals("yes")) {
                     brokerconnect(appid, key, secret);
                     context.bindService(new Intent(context, MicrogearService.class), serviceConnection, 0);
@@ -314,14 +313,14 @@ public class Microgear extends Activity {
 
     }
 
-    public void setalias(final String namedevice) {
+    public void setalias(final String newalias) {
         if (isConnectingToInternet()) {
-            if (!namedevice.isEmpty()) {
-                if (Checkname(namedevice)) {
+            if (!newalias.isEmpty()) {
+                if (Checkname(newalias)) {
                     new Thread(new Runnable() {
                         public void run() {
                             Bundle data = new Bundle();
-                            data.putCharSequence(MicrogearService.TOPIC, namedevice);
+                            data.putCharSequence(MicrogearService.TOPIC, newalias);
                             Message msg = Message.obtain(null, MicrogearService.SETNAME);
                             msg.setData(data);
                             try {
@@ -329,7 +328,7 @@ public class Microgear extends Activity {
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } catch (NullPointerException e) {
-                                Namedrive = namedevice;
+                                alias = newalias;
                             }
                         }
                     }).start();
@@ -377,7 +376,6 @@ public class Microgear extends Activity {
     }
     public void writeFeed(String feedid,JSONObject  data) {
         String feedTopic="/@writefeed/"+feedid;
-        //String stringData = data.toString().substring(1, data.toString().length() - 1);
         Iterator<String> iter = data.keys();
         String stringData = "{";
         while (iter.hasNext()) {
@@ -392,7 +390,6 @@ public class Microgear extends Activity {
         }
         stringData = stringData.substring(0, stringData.length()-1);
         stringData += "}";
-        //JSONArray datajson = new JSONArray(Arrays.asList(stringdata));
         publish(feedTopic,stringData);
     }
 
