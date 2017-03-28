@@ -13,11 +13,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,7 +87,6 @@ public class Microgear extends Activity {
 
             cDir = context.getCacheDir();
             tempFile = new File(cDir.getPath() + "/microgear" + key +".cache");
-
 
             if (isConnectingToInternet()) {
                 String a = oauthNetpieLibrary.create(appid, key, secret, tempFile.toString(),alias);

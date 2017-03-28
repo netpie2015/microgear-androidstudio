@@ -3,10 +3,8 @@ package io.netpie.microgear;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,13 +24,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import Decoder.BASE64Encoder;
-
-import static io.netpie.microgear.Microgear.alias;
 
 public class OauthNetpieLibrary extends Activity {
     public String pathtowrite;
@@ -46,12 +40,10 @@ public class OauthNetpieLibrary extends Activity {
     public static JSONObject file2 = new JSONObject();
     public static JSONObject file3 = new JSONObject();
     public static String End_point = "pie://gb.netpie.io:1883";
-    // String name = "microgear.cache";
     public static SimpleTask simpleTask;
     public static Revoketoken rf;
     public boolean revokemode = false;
     public String varifier = "NJS1a";
-    private boolean checkalias = false;
 
     public void resettoken(){
         revokemode = true;
@@ -78,8 +70,7 @@ public class OauthNetpieLibrary extends Activity {
             }
             if (chk != null) {
                 if (chk.equals(KEY)) {
-                    if(!alias.isEmpty()){
-                        checkalias = true;
+                    if(alias != null){
                         varifier = alias;
                     }
                     authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier="+varifier;
@@ -101,7 +92,7 @@ public class OauthNetpieLibrary extends Activity {
 
 
         } catch (FileNotFoundException e) {
-            if(!alias.isEmpty()){
+            if(alias != null){
                 varifier = alias;
             }
             authorize_callback = "scope=&appid=" + APP_ID + "&mgrev=NJS1a&verifier="+varifier;
