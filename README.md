@@ -6,7 +6,7 @@ microgear-android is a client library for Android Studio.The library is used to 
 -----------
 Refer to the latest version directly from the Jcenter using this Gradle 
 ```java
-compile 'io.netpie:microgear:1.1.2'
+compile 'io.netpie:microgear:1.1.3'
 ```
 <br/>
 
