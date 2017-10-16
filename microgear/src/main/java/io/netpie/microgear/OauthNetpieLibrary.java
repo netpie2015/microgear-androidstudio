@@ -351,6 +351,7 @@ public class OauthNetpieLibrary extends Activity {
             String access_token_secret = access.get("oauth_token_secret");
             String revoketoken = Signature(_Secret, access_token_secret, access_token);
             if(access.get("flag")!="S"){
+                Microgear.flag = "S";
                 file.putOpt("key", _Key);
                 file.put("requesttoken", "null");
                 file2.put("token", access_token);

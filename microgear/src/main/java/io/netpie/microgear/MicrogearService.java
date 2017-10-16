@@ -17,6 +17,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.eclipse.paho.client.mqttv3.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -257,8 +258,8 @@ public class MicrogearService extends Service {
             public ArrayList<Microgear.Publish> PublishList;
             public ArrayList<String> SubscribeList;
             public ArrayList<String> UnsubscribeList;
-            public String alais = null;
             public int qos = 0;
+            public int count = 0;
 
             public MsgHandler() {
                 options.setCleanSession(true);
@@ -278,6 +279,7 @@ public class MicrogearService extends Service {
                 PublishList = Microgear.PublishList;
                 UnsubscribeList = Microgear.UnsubscribeList;
                 String alias = Microgear.alias;
+
                 if (alias != null) {
                     setalias(alias);
                 }
@@ -328,7 +330,10 @@ public class MicrogearService extends Service {
                                     this.sendMessageDelayed(Message.obtain(null, CONNECT), timeout);
                                 } else if (e.getReasonCode() == 4) {
                                     Microgear.brokereventListener.reconnect();
-                                    Microgear.microgeareventListener.onError("Invalid credential");
+                                    if(!Microgear.flag.equals("S") && count == 0) {
+                                        Microgear.microgeareventListener.onError("Invalid credential");
+                                        count++;
+                                    }
                                 }
                                 return;
                             }

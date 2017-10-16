@@ -39,6 +39,7 @@ public class Microgear extends Activity {
     public IntentFilter intentFilter;
     public OauthNetpieLibrary oauthNetpieLibrary = new OauthNetpieLibrary();
     public MicrogearService senddatatoservice = new MicrogearService();
+    public static String oldappid, oldkey, oldsecret;
     public static String appidvalue, keyvalue, secretvalue;
     public File tempFile;
     public File cDir;
@@ -48,6 +49,8 @@ public class Microgear extends Activity {
     static MicrogearEventListener microgeareventListener ;
     static BrokerEventListener brokereventListener ;
     static String alias = null;
+    static String flag = null;
+    public int count = 0;
 
     public void resettoken(){
         oauthNetpieLibrary.resettoken();
@@ -81,17 +84,27 @@ public class Microgear extends Activity {
         if (appid.isEmpty() || key.isEmpty() || secret.isEmpty()) {
             microgeareventListener.onError("App id ,Key or Secret is Empty");
         } else {
+            if(oldappid != null || oldkey != null || oldsecret != null){
+                if(!appid.equals(oldappid) || !key.equals(oldkey) || !secret.equals(oldsecret)){
+                    PublishList = new ArrayList<Publish>();
+                    SubscribeList = new ArrayList<String>();
+                    UnsubscribeList = new ArrayList<String>();
+                }
+            }
             appidvalue = appid;
             keyvalue = key;
             secretvalue = secret;
 
             cDir = context.getCacheDir();
-            tempFile = new File(cDir.getPath() + "/microgear" + key +".cache");
+            tempFile = new File(cDir.getPath() + "/microgear-" + key +".cache");
 
             if (isConnectingToInternet()) {
                 String a = oauthNetpieLibrary.create(appid, key, secret, tempFile.toString(),alias);
                 if (a.equals("yes")) {
                     brokerconnect(appid, key, secret);
+                    oldappid = appid;
+                    oldkey = key;
+                    oldsecret = secret;
                     context.bindService(new Intent(context, MicrogearService.class), serviceConnection, 0);
                 } else if (a.equals("id")) {
                     microgeareventListener.onError("App id Invalid");
@@ -101,6 +114,9 @@ public class Microgear extends Activity {
                     disconnect();
                 } else {
                     brokerconnect(appid, key, secret);
+                    oldappid = appid;
+                    oldkey = key;
+                    oldsecret = secret;
                     context.bindService(new Intent(context, MicrogearService.class), serviceConnection, 0);
                 }
 
@@ -457,7 +473,10 @@ public class Microgear extends Activity {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            microgeareventListener.onError("service disconnect");
+            if(!Microgear.flag.equals("S") && count == 0) {
+                microgeareventListener.onInfo("service disconnect");
+                count ++;
+            }
         }
     };
 
